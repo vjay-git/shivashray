@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quotation - Shivashray Hotel Booking System</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+        }
+        
+        h1 {
+            color: #1a1a1a;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+            margin-top: 30px;
+            font-size: 24px;
+        }
+        
+        h2 {
+            color: #1e40af;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 20px;
+            border-left: 4px solid #2563eb;
+            padding-left: 10px;
+        }
+        
+        h3 {
+            color: #3b82f6;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        h4 {
+            color: #4b5563;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+        
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #2563eb;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            border: none;
+            margin: 0;
+            font-size: 28px;
+        }
+        
+        .meta-info {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f3f4f6;
+            border-radius: 5px;
+        }
+        
+        .meta-info div {
+            flex: 1;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+        
+        table th {
+            background: #2563eb;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        table tr:nth-child(even) {
+            background: #f9fafb;
+        }
+        
+        table tr:hover {
+            background: #f3f4f6;
+        }
+        
+        .cost-highlight {
+            background: #dbeafe;
+            padding: 15px;
+            border-left: 4px solid #2563eb;
+            margin: 15px 0;
+            font-weight: 600;
+        }
+        
+        .phase-box {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            background: #ffffff;
+        }
+        
+        .phase-box h3 {
+            margin-top: 0;
+            color: #1e40af;
+        }
+        
+        ul, ol {
+            margin: 10px 0;
+            padding-left: 30px;
+        }
+        
+        li {
+            margin: 5px 0;
+        }
+        
+        .checklist {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .checklist li:before {
+            content: "✓ ";
+            color: #10b981;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        
+        .crosslist {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .crosslist li:before {
+            content: "✗ ";
+            color: #ef4444;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        
+        .signature-section {
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 2px solid #e5e7eb;
+        }
+        
+        .signature-box {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+        }
+        
+        .signature-box div {
+            width: 45%;
+        }
+        
+        .footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+            font-size: 12px;
+            color: #6b7280;
+            text-align: center;
+        }
+        
+        .page-break {
+            page-break-before: always;
+        }
+        
+        .download-buttons {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .download-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .download-btn:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .download-btn:active {
+            transform: translateY(0);
+        }
+        
+        .download-btn.pdf {
+            background: #dc2626;
+        }
+        
+        .download-btn.pdf:hover {
+            background: #b91c1c;
+        }
+        
+        @media print {
+            body {
+                padding: 0;
+            }
+            
+            .page-break {
+                page-break-before: always;
+            }
+            
+            .download-buttons {
+                display: none;
+            }
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+    <div class="download-buttons">
+        <button class="download-btn pdf" onclick="downloadPDF()">📄 Download PDF</button>
+        <button class="download-btn" onclick="printPDF()">🖨️ Print/Save PDF</button>
+    </div>
+    
+    <div class="header">
+        <h1>QUOTATION FOR COMPLETE DEVELOPMENT & DEPLOYMENT</h1>
+        <h2>Shivashray Hotel Booking System</h2>
+    </div>
+    
+    <div class="meta-info">
+        <div>
+            <strong>Quotation Date:</strong> [Current Date]<br>
+            <strong>Quotation Number:</strong> QTN-SHS-2024-001<br>
+            <strong>Valid Until:</strong> [Date + 30 days]
+        </div>
+        <div>
+            <strong>Project:</strong> Complete Hotel Booking System<br>
+            <strong>Client:</strong> Shivashray Hotel, Varanasi<br>
+            <strong>Prepared By:</strong> Vijay/ workwithme.com
+        </div>
+    </div>
+    
+    <h2>EXECUTIVE SUMMARY</h2>
+    <p>This quotation outlines the complete development and deployment of a production-ready hotel booking system for Shivashray Hotel. The project includes frontend development (Next.js), backend API development (FastAPI), database design and implementation (PostgreSQL), payment gateway integration, email notifications, security hardening, and production deployment configuration.</p>
+    
+    <div class="cost-highlight">
+        <strong>Total Development Timeline:</strong> 25-35 working days (5-7 weeks)<br>
+        <strong>Total One-Time Development Cost:</strong> ₹2,50,000 - ₹3,50,000<br>
+        <strong>Recommended Monthly Operating Cost:</strong> ₹3,550 - ₹4,550/month
+    </div>
+    
+    <h2>PROJECT OVERVIEW</h2>
+    
+    <h3>System Architecture</h3>
+    <p>The hotel booking system is a full-stack web application consisting of:</p>
+    <ol>
+        <li><strong>Frontend Application</strong> - Next.js 14+ with TypeScript, responsive UI</li>
+        <li><strong>Backend API</strong> - FastAPI RESTful API with authentication</li>
+        <li><strong>Database</strong> - PostgreSQL with proper schema design and migrations</li>
+        <li><strong>Production Infrastructure</strong> - Docker, Nginx, automated backups</li>
+    </ol>
+    
+    <h3>Key Features</h3>
+    <p><strong>User Features:</strong></p>
+    <ul>
+        <li>Browse and search available rooms with filters</li>
+        <li>Real-time availability checking</li>
+        <li>User registration and authentication</li>
+        <li>Booking creation and management</li>
+        <li>View booking history</li>
+        <li>Hotel services and amenities display</li>
+        <li>Responsive design for all devices</li>
+    </ul>
+    
+    <p><strong>Admin Features:</strong></p>
+    <ul>
+        <li>Admin dashboard with booking statistics</li>
+        <li>Room management (create, update, delete)</li>
+        <li>Booking management (confirm, check-in, check-out, cancel)</li>
+        <li>Payment status management</li>
+        <li>Revenue tracking</li>
+        <li>User management</li>
+    </ul>
+    
+    <div class="page-break"></div>
+    
+    <h1>PHASE-WISE DEVELOPMENT BREAKDOWN</h1>
+    
+    <div class="phase-box">
+        <h3>PHASE 1: DATABASE DESIGN & IMPLEMENTATION</h3>
+        <p><strong>Priority:</strong> Critical | <strong>Timeline:</strong> 3-4 working days (24-32 hours)</p>
+        
+        <h4>Scope of Work</h4>
+        <p><strong>Database Schema Design:</strong></p>
+        <ul>
+            <li>Users table (authentication, roles, profiles)</li>
+            <li>Room Types table (room categories, pricing)</li>
+            <li>Rooms table (individual room inventory)</li>
+            <li>Room Amenities table (features and facilities)</li>
+            <li>Bookings table (reservations, dates, status)</li>
+            <li>Services table (hotel services and amenities)</li>
+            <li>Payment Transactions table (payment records)</li>
+        </ul>
+        
+        <p><strong>Database Implementation:</strong></p>
+        <ul>
+            <li>PostgreSQL database setup</li>
+            <li>Schema creation with proper relationships</li>
+            <li>Indexes for performance optimization</li>
+            <li>Foreign key constraints</li>
+            <li>Database migration system (Alembic)</li>
+            <li>Seed data scripts for initial data</li>
+            <li>Database connection pooling configuration</li>
+        </ul>
+        
+        <div class="cost-highlight">
+            <strong>Development Cost:</strong> ₹35,000 - ₹45,000
+        </div>
+    </div>
+    
+    <div class="phase-box">
+        <h3>PHASE 2: BACKEND API DEVELOPMENT</h3>
+        <p><strong>Priority:</strong> Critical | <strong>Timeline:</strong> 8-10 working days (64-80 hours)</p>
+        
+        <h4>Scope of Work</h4>
+        <p>Complete FastAPI backend with authentication, rooms management, bookings management, admin APIs, and services APIs.</p>
+        
+        <p><strong>API Endpoints (18+ endpoints):</strong></p>
+        <ul>
+            <li>POST /api/v1/auth/register - User registration</li>
+            <li>POST /api/v1/auth/login - User login</li>
+            <li>POST /api/v1/auth/refresh - Refresh token</li>
+            <li>GET /api/v1/auth/me - Get current user</li>
+            <li>GET /api/v1/rooms - List rooms</li>
+            <li>GET /api/v1/rooms/{id} - Get room details</li>
+            <li>GET /api/v1/rooms/{id}/availability - Check availability</li>
+            <li>GET /api/v1/rooms/types - List room types</li>
+            <li>POST /api/v1/bookings - Create booking</li>
+            <li>GET /api/v1/bookings - List user bookings</li>
+            <li>GET /api/v1/bookings/{id} - Get booking details</li>
+            <li>PATCH /api/v1/bookings/{id} - Update booking</li>
+            <li>DELETE /api/v1/bookings/{id} - Cancel booking</li>
+            <li>GET /api/v1/admin/bookings - List all bookings (admin)</li>
+            <li>PATCH /api/v1/admin/bookings/{id} - Update booking (admin)</li>
+            <li>POST /api/v1/admin/rooms - Create room (admin)</li>
+            <li>GET /api/v1/services - List services</li>
+            <li>GET /api/v1/services/{id} - Get service details</li>
+        </ul>
+        
+        <div class="cost-highlight">
+            <strong>Development Cost:</strong> ₹80,000 - ₹1,00,000
+        </div>
+    </div>
+    
+    <div class="phase-box">
+        <h3>PHASE 3: FRONTEND DEVELOPMENT</h3>
+        <p><strong>Priority:</strong> Critical | <strong>Timeline:</strong> 10-12 working days (80-96 hours)</p>
+        
+        <h4>Pages Development (10+ pages):</h4>
+        <ul>
+            <li>Home Page with hero, features, rooms preview, services, testimonials</li>
+            <li>Rooms Listing Page with filters and search</li>
+            <li>Room Details Page with gallery and booking form</li>
+            <li>Booking Pages (form, confirmation, details, history)</li>
+            <li>Authentication Pages (registration, login)</li>
+            <li>Admin Dashboard with statistics and management</li>
+            <li>About, Services, and Contact pages</li>
+        </ul>
+        
+        <div class="cost-highlight">
+            <strong>Development Cost:</strong> ₹1,00,000 - ₹1,30,000
+        </div>
+    </div>
+    
+    <div class="phase-box">
+        <h3>PHASE 4: PAYMENT GATEWAY INTEGRATION (Razorpay)</h3>
+        <p><strong>Priority:</strong> Critical | <strong>Timeline:</strong> 2-3 working days (16-24 hours)</p>
+        
+        <p>Complete Razorpay integration with payment service, API endpoints, frontend components, and transaction tracking.</p>
+        
+        <div class="cost-highlight">
+            <strong>Development Cost:</strong> ₹20,000 - ₹25,000<br>
+            <strong>Transaction Fees:</strong> 2.36% (domestic) or 3.54% (international) per booking
+        </div>
+    </div>
+    
+    <div class="phase-box">
+        <h3>PHASE 5: EMAIL NOTIFICATION SYSTEM</h3>
+        <p><strong>Priority:</strong> High | <strong>Timeline:</strong> 1-2 working days (8-16 hours)</p>
+        
+        <p>Email service with HTML templates for booking confirmations, payment confirmations, and cancellations.</p>
+        
+        <div class="cost-highlight">
+            <strong>Development Cost:</strong> ₹8,000 - ₹10,000<br>
+            <strong>Monthly Cost:</strong> ₹500-3,000/month (depending on email service)
+        </div>
+    </div>
+    
+    <div class="phase-box">
+        <h3>PHASE 6: SECURITY HARDENING</h3>
+        <p><strong>Priority:</strong> Critical | <strong>Timeline:</strong> 1-2 working days (8-16 hours)</p>
+        
+        <p>Rate limiting, input validation, CORS configuration, security headers, CSRF protection, and monitoring.</p>
+        
+        <div class="cost-highlight">
+            <strong>Development Cost:</strong> ₹12,000 - ₹15,000
+        </div>
+    </div>
+    
+    <div class="phase-box">
+        <h3>PHASE 7: PRODUCTION ENVIRONMENT CONFIGURATION</h3>
+        <p><strong>Priority:</strong> Critical | <strong>Timeline:</strong> 2-3 working days (16-24 hours)</p>
+        
+        <p>Docker Compose, production Dockerfiles, Nginx configuration, SSL setup, and health checks.</p>
+        
+        <div class="cost-highlight">
+            <strong>Development Cost:</strong> ₹15,000 - ₹20,000
+        </div>
+    </div>
+    
+    <div class="phase-box">
+        <h3>PHASE 8: DATABASE BACKUP STRATEGY</h3>
+        <p><strong>Priority:</strong> High | <strong>Timeline:</strong> 1 working day (8 hours)</p>
+        
+        <p>Automated daily backups with 30-day retention policy and restore procedures.</p>
+        
+        <div class="cost-highlight">
+            <strong>Development Cost:</strong> ₹5,000 - ₹6,000<br>
+            <strong>Monthly Cost:</strong> ₹500-1,000/month (backup storage)
+        </div>
+    </div>
+    
+    <div class="phase-box">
+        <h3>PHASE 9: FRONTEND PRODUCTION BUILD</h3>
+        <p><strong>Priority:</strong> High | <strong>Timeline:</strong> 1 working day (8 hours)</p>
+        
+        <p>Next.js production optimizations, image optimization, error boundaries, and performance tuning.</p>
+        
+        <div class="cost-highlight">
+            <strong>Development Cost:</strong> ₹4,000 - ₹5,000
+        </div>
+    </div>
+    
+    <div class="phase-box">
+        <h3>PHASE 10: DEPLOYMENT DOCUMENTATION</h3>
+        <p><strong>Priority:</strong> Medium | <strong>Timeline:</strong> 1 working day (8 hours)</p>
+        
+        <p>Comprehensive deployment guide, production checklist, API documentation, and admin user manual.</p>
+        
+        <div class="cost-highlight">
+            <strong>Development Cost:</strong> ₹3,000 - ₹4,000
+        </div>
+    </div>
+    
+    <div class="page-break"></div>
+    
+    <h1>COST SUMMARY</h1>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Phase</th>
+                <th>Description</th>
+                <th>Timeline</th>
+                <th>Cost (₹)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Phase 1</td>
+                <td>Database Design & Implementation</td>
+                <td>3-4 days</td>
+                <td>35,000 - 45,000</td>
+            </tr>
+            <tr>
+                <td>Phase 2</td>
+                <td>Backend API Development</td>
+                <td>8-10 days</td>
+                <td>80,000 - 1,00,000</td>
+            </tr>
+            <tr>
+                <td>Phase 3</td>
+                <td>Frontend Development</td>
+                <td>10-12 days</td>
+                <td>1,00,000 - 1,30,000</td>
+            </tr>
+            <tr>
+                <td>Phase 4</td>
+                <td>Payment Gateway Integration</td>
+                <td>2-3 days</td>
+                <td>20,000 - 25,000</td>
+            </tr>
+            <tr>
+                <td>Phase 5</td>
+                <td>Email Notification System</td>
+                <td>1-2 days</td>
+                <td>8,000 - 10,000</td>
+            </tr>
+            <tr>
+                <td>Phase 6</td>
+                <td>Security Hardening</td>
+                <td>1-2 days</td>
+                <td>12,000 - 15,000</td>
+            </tr>
+            <tr>
+                <td>Phase 7</td>
+                <td>Production Configuration</td>
+                <td>2-3 days</td>
+                <td>15,000 - 20,000</td>
+            </tr>
+            <tr>
+                <td>Phase 8</td>
+                <td>Database Backup Strategy</td>
+                <td>1 day</td>
+                <td>5,000 - 6,000</td>
+            </tr>
+            <tr>
+                <td>Phase 9</td>
+                <td>Frontend Production Build</td>
+                <td>1 day</td>
+                <td>4,000 - 5,000</td>
+            </tr>
+            <tr>
+                <td>Phase 10</td>
+                <td>Deployment Documentation</td>
+                <td>1 day</td>
+                <td>3,000 - 4,000</td>
+            </tr>
+            <tr>
+                <td colspan="2"><strong>TOTAL</strong></td>
+                <td><strong>25-35 days</strong></td>
+                <td><strong>₹2,82,000 - ₹3,60,000</strong></td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <h2>MONTHLY RECURRING COSTS</h2>
+    
+    <h3>Recommended Production Setup: ₹4,050/month</h3>
+    <ul>
+        <li>Hosting (DigitalOcean 4GB): ₹2,000/month</li>
+        <li>Email Service (SendGrid): ₹1,500/month</li>
+        <li>Domain: ₹50/month</li>
+        <li>Backup Storage: ₹500/month</li>
+    </ul>
+    
+    <h2>PAYMENT TERMS</h2>
+    
+    <p><strong>Total Development Cost: ₹2,82,000 - ₹3,60,000</strong></p>
+    
+    <p><strong>Payment Schedule:</strong></p>
+    <ul>
+        <li><strong>Advance Payment (25%):</strong> ₹70,500 - ₹90,000 (Upon project initiation)</li>
+        <li><strong>Milestone 1 (25%):</strong> ₹70,500 - ₹90,000 (Upon completion of Phases 1-2)</li>
+        <li><strong>Milestone 2 (35%):</strong> ₹98,700 - ₹1,26,000 (Upon completion of Phase 3)</li>
+        <li><strong>Milestone 3 (25%):</strong> ₹70,500 - ₹90,000 (Upon completion of Phases 4-6)</li>
+        <li><strong>Final Payment (15%):</strong> ₹42,300 - ₹54,000 (Upon completion, testing & deployment)</li>
+    </ul>
+    
+    <div class="page-break"></div>
+    
+    <h1>SCOPE OF WORK</h1>
+    
+    <h2>What's Included</h2>
+    <ul class="checklist">
+        <li>Complete database design and implementation (PostgreSQL)</li>
+        <li>Full backend API development (FastAPI) with 18+ endpoints</li>
+        <li>Complete frontend development (Next.js) with 10+ pages</li>
+        <li>Payment gateway integration (Razorpay)</li>
+        <li>Email notification system with templates</li>
+        <li>Security hardening (rate limiting, validation, headers)</li>
+        <li>Production deployment configuration</li>
+        <li>Docker containerization (backend & frontend)</li>
+        <li>Nginx reverse proxy configuration</li>
+        <li>Database backup automation</li>
+        <li>Frontend production optimizations</li>
+        <li>Comprehensive deployment documentation</li>
+        <li>Production checklist and testing</li>
+        <li>Deployment support and handover</li>
+        <li>30 days post-deployment support (bug fixes only)</li>
+        <li>API documentation (Swagger/OpenAPI)</li>
+        <li>Admin user manual</li>
+    </ul>
+    
+    <h2>What's NOT Included</h2>
+    <ul class="crosslist">
+        <li>Domain name purchase (we can assist)</li>
+        <li>SSL certificate purchase (we'll use free Let's Encrypt)</li>
+        <li>Server/hosting setup (we'll provide configuration)</li>
+        <li>Third-party service subscriptions (Razorpay, email service)</li>
+        <li>Ongoing maintenance and updates (available separately)</li>
+        <li>Custom feature development beyond scope</li>
+        <li>Design changes or UI/UX modifications</li>
+        <li>Content creation or copywriting</li>
+        <li>Marketing or SEO services</li>
+        <li>Mobile app development</li>
+    </ul>
+    
+    <h1>TECHNICAL SPECIFICATIONS</h1>
+    
+    <h2>Technology Stack</h2>
+    
+    <p><strong>Frontend:</strong></p>
+    <ul>
+        <li>Next.js 14+ with TypeScript</li>
+        <li>Tailwind CSS for styling</li>
+        <li>shadcn/ui component library</li>
+        <li>React Hook Form for form handling</li>
+        <li>Axios for API calls</li>
+        <li>Zustand for state management</li>
+        <li>Responsive design (mobile-first)</li>
+    </ul>
+    
+    <p><strong>Backend:</strong></p>
+    <ul>
+        <li>Python FastAPI framework</li>
+        <li>SQLAlchemy ORM</li>
+        <li>PostgreSQL database</li>
+        <li>JWT authentication</li>
+        <li>Alembic for database migrations</li>
+        <li>Pydantic for data validation</li>
+        <li>Bcrypt for password hashing</li>
+    </ul>
+    
+    <p><strong>Infrastructure:</strong></p>
+    <ul>
+        <li>Docker & Docker Compose</li>
+        <li>Nginx reverse proxy</li>
+        <li>Gunicorn + Uvicorn workers</li>
+        <li>Automated backups</li>
+        <li>Health check endpoints</li>
+    </ul>
+    
+    <div class="page-break"></div>
+    
+    <h1>TERMS & CONDITIONS</h1>
+    
+    <ol>
+        <li><strong>Project Timeline:</strong> Timeline is estimated and may vary based on client feedback and requirements changes. Delays in client approvals will extend the timeline accordingly.</li>
+        <li><strong>Scope Changes:</strong> Any changes to the scope of work will be quoted separately and require written approval before implementation.</li>
+        <li><strong>Intellectual Property:</strong> Upon full payment, all code, documentation, and intellectual property will be transferred to the client.</li>
+        <li><strong>Warranty:</strong> We provide 30 days warranty for bug fixes related to delivered features. Warranty does not cover changes or additions to scope.</li>
+        <li><strong>Third-Party Services:</strong> Client is responsible for setting up and maintaining third-party service accounts (Razorpay, email service, hosting). We will assist with configuration.</li>
+        <li><strong>Data Backup:</strong> While we implement backup systems, client is ultimately responsible for data backup and recovery. We recommend regular backup verification.</li>
+        <li><strong>Cancellation:</strong> If project is cancelled, payment for completed work is non-refundable. Work completed will be delivered to client.</li>
+        <li><strong>Confidentiality:</strong> All project information will be kept confidential. We will not share code or project details with third parties.</li>
+        <li><strong>Force Majeure:</strong> Delays due to circumstances beyond our control (natural disasters, third-party service outages, internet connectivity issues) are not our responsibility.</li>
+        <li><strong>Governing Law:</strong> This agreement is governed by Indian law. Any disputes will be subject to the jurisdiction of relevant courts.</li>
+        <li><strong>Source Code:</strong> Complete source code will be provided upon final payment. Code will be delivered via Git repository or ZIP file.</li>
+        <li><strong>Training:</strong> Basic training on admin panel usage is included. Additional training sessions can be arranged at extra cost.</li>
+    </ol>
+    
+    <div class="signature-section">
+        <h1>ACCEPTANCE</h1>
+        <p>I/We have read and understood the terms and conditions of this quotation and agree to proceed with the project as outlined.</p>
+        
+        <div class="signature-box">
+            <div>
+                <p><strong>Client Signature:</strong> _________________________</p>
+                <p><strong>Date:</strong> _________________________</p>
+                <p><strong>Name:</strong> _________________________</p>
+                <p><strong>Designation:</strong> _________________________</p>
+                <p><strong>Company/Organization:</strong> _________________________</p>
+            </div>
+            <div>
+                <p><strong>Developer Signature:</strong> _________________________</p>
+                <p><strong>Date:</strong> _________________________</p>
+                <p><strong>Name:</strong> _________________________</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p><strong>Thank you for considering our services. We look forward to working with you on this project and delivering a world-class hotel booking system for Shivashray Hotel.</strong></p>
+        <p>This quotation is valid for 30 days from the date of issue. Prices are subject to change after the validity period.</p>
+        <p>For any queries or clarifications, please feel free to contact us.</p>
+    </div>
+    
+    <script>
+        function downloadPDF() {
+            const element = document.body;
+            const opt = {
+                margin: [15, 15, 15, 15],
+                filename: 'Quotation_Shivashray_Hotel_Booking_System.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            
+            // Show loading message
+            const originalContent = document.body.innerHTML;
+            const loadingDiv = document.createElement('div');
+            loadingDiv.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:20px;border-radius:8px;box-shadow:0 4px 6px rgba(0,0,0,0.1);z-index:10000;';
+            loadingDiv.innerHTML = '<p style="margin:0;font-size:16px;">Generating PDF... Please wait.</p>';
+            document.body.appendChild(loadingDiv);
+            
+            html2pdf().set(opt).from(element).save().then(() => {
+                document.body.removeChild(loadingDiv);
+            }).catch((error) => {
+                console.error('PDF generation error:', error);
+                document.body.removeChild(loadingDiv);
+                alert('PDF generation failed. Please use the Print/Save PDF option instead.');
+            });
+        }
+        
+        function printPDF() {
+            window.print();
+        }
+    </script>
+</body>
+</html>
+
