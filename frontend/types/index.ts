@@ -70,3 +70,23 @@ export interface AuthResponse {
   token_type: string;
 }
 
+export type PlaceCategory = 'sacred-temples' | 'nature-scenic' | 'cultural-landmarks' | 'short-excursions';
+
+export interface Place {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  category: PlaceCategory;
+  distance?: string;
+  travelHint?: string;
+  imageUrl?: string;
+  content: {
+    introduction: string;
+    context?: string;
+    culturalContext?: string;
+    spiritualContext?: string;
+    howToReach?: string;
+  };
+}
+
