@@ -1,4 +1,4 @@
-import { Place } from '@/types';
+import { Place, PlaceCategory } from '@/types';
 
 export const places: Place[] = [
   {
