@@ -8,6 +8,8 @@ class BookingBase(BaseModel):
     check_in_date: datetime
     check_out_date: datetime
     number_of_guests: int = 1
+    number_of_adults: Optional[int] = None
+    number_of_children: Optional[int] = None
     guest_name: str
     guest_email: EmailStr
     guest_phone: Optional[str] = None

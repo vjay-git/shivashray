@@ -89,9 +89,9 @@ export function Navbar() {
               <Image
                 src="/shivashray.png"
                 alt={hotelContent.name}
-                width={180}
-                height={40}
-                className="h-8 w-auto object-contain"
+                width={240}
+                height={60}
+                className="h-12 sm:h-14 w-auto object-contain"
                 priority
               />
             </Link>

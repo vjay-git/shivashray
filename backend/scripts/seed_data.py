@@ -48,25 +48,31 @@ def seed_data():
                 db.add(amenity)
         print("Created room amenities")
         
-        # Create room types
+        # Create room types with pricing
         room_types_data = [
             {
-                "name": "Standard",
-                "description": "Comfortable standard room with essential amenities",
+                "name": "Deluxe Room",
+                "description": "Spacious deluxe room with premium amenities, perfect for couples or small families",
                 "max_occupancy": 2,
-                "base_price": 2000.0
+                "base_price": 4000.0,  # Double occupancy
+                "extra_adult_price": 1500.0,
+                "child_price": 1200.0
             },
             {
-                "name": "Deluxe",
-                "description": "Spacious deluxe room with premium amenities",
-                "max_occupancy": 3,
-                "base_price": 3500.0
+                "name": "Super Deluxe Room",
+                "description": "Luxurious super deluxe room with separate living area and premium amenities",
+                "max_occupancy": 2,
+                "base_price": 6000.0,  # Double occupancy
+                "extra_adult_price": 2100.0,
+                "child_price": 1500.0
             },
             {
-                "name": "Suite",
-                "description": "Luxurious suite with separate living area",
+                "name": "Family Room",
+                "description": "Spacious family room ideal for families, with quad occupancy and family-friendly amenities",
                 "max_occupancy": 4,
-                "base_price": 5500.0
+                "base_price": 6500.0,  # Quad occupancy
+                "extra_adult_price": 2275.0,
+                "child_price": 1625.0
             },
         ]
         
@@ -82,16 +88,35 @@ def seed_data():
                 room_types[rt_data["name"]] = existing
         print("Created room types")
         
-        # Create rooms
-        rooms_data = [
-            {"number": "101", "type": "Standard", "floor": 1, "amenities": ["WiFi", "AC", "TV"]},
-            {"number": "102", "type": "Standard", "floor": 1, "amenities": ["WiFi", "AC", "TV"]},
-            {"number": "103", "type": "Standard", "floor": 1, "amenities": ["WiFi", "AC", "TV"]},
-            {"number": "201", "type": "Deluxe", "floor": 2, "amenities": ["WiFi", "AC", "TV", "Mini Bar", "Balcony"]},
-            {"number": "202", "type": "Deluxe", "floor": 2, "amenities": ["WiFi", "AC", "TV", "Mini Bar", "Balcony"]},
-            {"number": "301", "type": "Suite", "floor": 3, "amenities": ["WiFi", "AC", "TV", "Mini Bar", "Balcony", "River View"]},
-            {"number": "302", "type": "Suite", "floor": 3, "amenities": ["WiFi", "AC", "TV", "Mini Bar", "Balcony", "River View"]},
-        ]
+        # Create 25 rooms across 3 floors
+        rooms_data = []
+        
+        # Floor 1: Deluxe Rooms (8 rooms)
+        for i in range(1, 9):
+            rooms_data.append({
+                "number": f"10{i}",
+                "type": "Deluxe Room",
+                "floor": 1,
+                "amenities": ["WiFi", "Air Conditioning", "TV"]
+            })
+        
+        # Floor 2: Super Deluxe Rooms (9 rooms)
+        for i in range(1, 10):
+            rooms_data.append({
+                "number": f"20{i}",
+                "type": "Super Deluxe Room",
+                "floor": 2,
+                "amenities": ["WiFi", "Air Conditioning", "TV", "Mini Bar", "Balcony"]
+            })
+        
+        # Floor 3: Family Rooms (8 rooms)
+        for i in range(1, 9):
+            rooms_data.append({
+                "number": f"30{i}",
+                "type": "Family Room",
+                "floor": 3,
+                "amenities": ["WiFi", "Air Conditioning", "TV", "Mini Bar", "Balcony"]
+            })
         
         for room_data in rooms_data:
             existing = db.query(Room).filter(Room.room_number == room_data["number"]).first()

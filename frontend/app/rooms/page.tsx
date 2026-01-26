@@ -7,6 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { hotelContent } from '@/lib/content/hotel-content';
 import { getRoomTypeImage, getRoomImageByIndex } from '@/lib/utils/room-images';
+import { hardcodedRoomTypes } from '@/lib/data/room-types';
 
 export default function RoomsPage() {
   const [rooms, setRooms] = useState<Room[]>([]);
@@ -58,13 +59,19 @@ export default function RoomsPage() {
   const fetchRoomTypes = async () => {
     try {
       const response = await api.get('/rooms/types');
-      setRoomTypes(response.data);
-      if (response.data.length > 0) {
-        const prices = response.data.map((rt: RoomType) => rt.base_price);
+      // Use API data if available, otherwise fallback to hardcoded
+      const types = response.data && response.data.length > 0 ? response.data : hardcodedRoomTypes;
+      setRoomTypes(types);
+      if (types.length > 0) {
+        const prices = types.map((rt: RoomType) => rt.base_price);
         setPriceRange([Math.min(...prices), Math.max(...prices)]);
       }
     } catch (error) {
-      console.error('Error fetching room types:', error);
+      // On error, use hardcoded data
+      console.error('Error fetching room types, using hardcoded data:', error);
+      setRoomTypes(hardcodedRoomTypes);
+      const prices = hardcodedRoomTypes.map((rt) => rt.base_price);
+      setPriceRange([Math.min(...prices), Math.max(...prices)]);
     }
   };
 
@@ -299,6 +306,7 @@ export default function RoomsPage() {
                         }
                         alt={room.room_number}
                         fill
+                        quality={100}
                         className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                         sizes="(max-width: 1024px) 100vw, 50vw"
                       />

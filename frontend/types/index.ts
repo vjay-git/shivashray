@@ -14,6 +14,8 @@ export interface RoomType {
   description?: string;
   max_occupancy: number;
   base_price: number;
+  extra_adult_price?: number;
+  child_price?: number;
   created_at: string;
 }
 
@@ -43,6 +45,8 @@ export interface Booking {
   check_in_date: string;
   check_out_date: string;
   number_of_guests: number;
+  number_of_adults?: number;
+  number_of_children?: number;
   total_amount: number;
   status: 'pending' | 'confirmed' | 'checked_in' | 'checked_out' | 'cancelled';
   payment_status: 'pending' | 'paid' | 'refunded';

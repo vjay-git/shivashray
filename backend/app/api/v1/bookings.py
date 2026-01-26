@@ -49,9 +49,33 @@ async def create_booking(
             detail="Room is not available for the selected dates"
         )
     
-    # Calculate total amount
+    # Calculate total amount based on occupancy and pricing
     nights = (booking_data.check_out_date - booking_data.check_in_date).days
-    total_amount = room.room_type.base_price * nights
+    base_amount = room.room_type.base_price * nights
+    
+    # Calculate extra charges for adults and children
+    extra_amount = 0.0
+    number_of_adults = booking_data.number_of_adults or booking_data.number_of_guests
+    number_of_children = booking_data.number_of_children or 0
+    
+    # Determine base occupancy based on room type
+    if "Family Room" in room.room_type.name:
+        base_occupancy = 4  # Quad occupancy
+    else:
+        base_occupancy = 2  # Double occupancy for Deluxe/Super Deluxe
+    
+    # Calculate extra adults (adults beyond base occupancy)
+    total_adults = number_of_adults
+    if total_adults > base_occupancy:
+        extra_adults = total_adults - base_occupancy
+        if room.room_type.extra_adult_price:
+            extra_amount += extra_adults * room.room_type.extra_adult_price * nights
+    
+    # Calculate children charges
+    if number_of_children > 0 and room.room_type.child_price:
+        extra_amount += number_of_children * room.room_type.child_price * nights
+    
+    total_amount = base_amount + extra_amount
     
     # Create booking
     db_booking = Booking(
@@ -60,6 +84,8 @@ async def create_booking(
         check_in_date=booking_data.check_in_date,
         check_out_date=booking_data.check_out_date,
         number_of_guests=booking_data.number_of_guests,
+        number_of_adults=booking_data.number_of_adults or booking_data.number_of_guests,
+        number_of_children=booking_data.number_of_children or 0,
         total_amount=total_amount,
         status=BookingStatus.PENDING,
         payment_status=PaymentStatus.PENDING,

@@ -88,7 +88,7 @@ export default function RoomDetailPage() {
                   alt={room.room_number}
                   fill
                   priority
-                  quality={90}
+                  quality={100}
                   className="object-cover transition-opacity duration-500"
                   sizes="100vw"
                 />
@@ -164,7 +164,9 @@ export default function RoomDetailPage() {
                     </p>
                   </div>
                   <div>
-                    <p className="text-[13px] text-gray-500 uppercase tracking-wide font-medium mb-2">Price</p>
+                    <p className="text-[13px] text-gray-500 uppercase tracking-wide font-medium mb-2">
+                      {room.room_type.name.includes('Family Room') ? 'Quad Price' : 'Double Price'}
+                    </p>
                     <p className="text-[21px] font-semibold text-gray-900">
                       ₹{room.room_type.base_price.toLocaleString('en-IN')}
                     </p>
@@ -185,6 +187,33 @@ export default function RoomDetailPage() {
                     </span>
                   </div>
                 </div>
+
+                {/* Additional Pricing Information */}
+                {(room.room_type.extra_adult_price || room.room_type.child_price) && (
+                  <div className="mt-6 pt-6 border-t border-gray-100/60">
+                    <p className="text-[15px] text-gray-500 uppercase tracking-wide font-medium mb-4">Additional Pricing</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {room.room_type.extra_adult_price && (
+                        <div className="bg-gray-50/50 rounded-xl p-4 border border-gray-100/60">
+                          <p className="text-[13px] text-gray-600 font-light mb-1">Extra Adult</p>
+                          <p className="text-[19px] font-semibold text-gray-900">
+                            ₹{room.room_type.extra_adult_price.toLocaleString('en-IN')}
+                            <span className="text-[14px] font-normal text-gray-600">/night</span>
+                          </p>
+                        </div>
+                      )}
+                      {room.room_type.child_price && (
+                        <div className="bg-gray-50/50 rounded-xl p-4 border border-gray-100/60">
+                          <p className="text-[13px] text-gray-600 font-light mb-1">Child (0-12 years)</p>
+                          <p className="text-[19px] font-semibold text-gray-900">
+                            ₹{room.room_type.child_price.toLocaleString('en-IN')}
+                            <span className="text-[14px] font-normal text-gray-600">/night</span>
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Amenities Section */}

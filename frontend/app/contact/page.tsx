@@ -67,6 +67,22 @@ export default function ContactPage() {
       ),
       title: 'Address',
       content: hotelContent.location.address,
+      link: hotelContent.location.googleMapsUrl,
+      isExternal: true,
+    },
+    {
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={1.5}
+            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+          />
+        </svg>
+      ),
+      title: 'Contact Person',
+      content: hotelContent.contact.contactPerson,
       link: '#',
     },
     {
@@ -96,8 +112,8 @@ export default function ContactPage() {
         </svg>
       ),
       title: 'Email',
-      content: hotelContent.contact.reservationEmail,
-      link: `mailto:${hotelContent.contact.reservationEmail}`,
+      content: hotelContent.contact.email,
+      link: `mailto:${hotelContent.contact.email}`,
     },
   ];
 
@@ -139,27 +155,72 @@ export default function ContactPage() {
               style={{ transitionDelay: '100ms' }}
             >
               <div className="space-y-6">
-                {contactInfo.map((info, index) => (
-                  <a
-                    key={index}
-                    href={info.link}
-                    className="group block bg-white/70 backdrop-blur-sm rounded-[24px] p-6 border border-gray-100/60 hover:border-gray-200/80 hover:bg-white/70 hover:shadow-lg transition-all duration-300 ease-out"
-                  >
-                    <div className="flex items-start space-x-4">
-                      <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gray-100/50 flex items-center justify-center text-gray-600 group-hover:text-gray-900 transition-colors">
-                        {info.icon}
+                {contactInfo.map((info, index) => {
+                  const Component = info.link === '#' ? 'div' : 'a';
+                  const props = info.link === '#' 
+                    ? {} 
+                    : {
+                        href: info.link,
+                        ...(info.isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {}),
+                      };
+                  
+                  return (
+                    <Component
+                      key={index}
+                      {...props}
+                      className={`group block bg-white/70 backdrop-blur-sm rounded-[24px] p-6 border border-gray-100/60 hover:border-gray-200/80 hover:bg-white/70 hover:shadow-lg transition-all duration-300 ease-out ${info.link === '#' ? '' : 'cursor-pointer'}`}
+                    >
+                      <div className="flex items-start space-x-4">
+                        <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gray-100/50 flex items-center justify-center text-gray-600 group-hover:text-gray-900 transition-colors">
+                          {info.icon}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-[17px] font-semibold text-gray-900 mb-1">
+                            {info.title}
+                          </h3>
+                          <p className="text-[15px] text-gray-600 font-light leading-relaxed break-words">
+                            {info.content}
+                          </p>
+                          {info.isExternal && (
+                            <p className="text-[13px] text-[#007aff] mt-2 font-medium">
+                              View on Google Maps →
+                            </p>
+                          )}
+                        </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-[17px] font-semibold text-gray-900 mb-1">
-                          {info.title}
-                        </h3>
-                        <p className="text-[15px] text-gray-600 font-light leading-relaxed break-words">
-                          {info.content}
-                        </p>
-                      </div>
-                    </div>
-                  </a>
-                ))}
+                    </Component>
+                  );
+                })}
+              </div>
+
+              {/* Google Maps Embed */}
+              <div className="mt-8 bg-white/70 backdrop-blur-sm rounded-[24px] p-6 border border-gray-100/60 overflow-hidden">
+                <h3 className="text-[17px] font-semibold text-gray-900 mb-4">
+                  Find Us on Map
+                </h3>
+                <div className="relative w-full h-64 rounded-xl overflow-hidden">
+                  <iframe
+                    src={`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3609.1234567890123!2d83.0104!3d25.3176!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x398e2db76febcf4d%3A0x68131710853ff0b5!2sKashi%20Vishwanath%20Temple!5e0!3m2!1sen!2sin!4v1234567890123!5m2!1sen!2sin`}
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    className="absolute inset-0"
+                  />
+                </div>
+                <a
+                  href={hotelContent.location.googleMapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center mt-4 text-[#007aff] hover:text-[#0051d5] transition-colors text-[15px] font-medium"
+                >
+                  Open in Google Maps
+                  <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
               </div>
             </div>
 

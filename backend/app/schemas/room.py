@@ -7,6 +7,8 @@ class RoomTypeBase(BaseModel):
     description: Optional[str] = None
     max_occupancy: int
     base_price: float
+    extra_adult_price: Optional[float] = None
+    child_price: Optional[float] = None
 
 class RoomTypeCreate(RoomTypeBase):
     pass

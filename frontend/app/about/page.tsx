@@ -88,7 +88,7 @@ export default function AboutPage() {
             alt="Spiritual heritage"
             fill
             priority
-            quality={95}
+            quality={100}
             className="object-cover"
             sizes="100vw"
             style={{
@@ -162,7 +162,7 @@ export default function AboutPage() {
                   src="/lordshiva2.jpg"
                   alt="Spiritual journey"
                   fill
-                  quality={95}
+                  quality={100}
                   className="object-cover transition-transform duration-700 ease-out"
                   sizes="(max-width: 1024px) 100vw, 58vw"
                 />
@@ -226,7 +226,7 @@ export default function AboutPage() {
             src="/lordshiva1.jpg"
             alt="Spiritual experience"
             fill
-            quality={95}
+            quality={100}
             className="object-cover transition-transform duration-700 ease-out"
             sizes="100vw"
             style={{

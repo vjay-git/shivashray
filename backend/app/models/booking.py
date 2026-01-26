@@ -25,6 +25,8 @@ class Booking(Base):
     check_in_date = Column(DateTime(timezone=True), nullable=False, index=True)
     check_out_date = Column(DateTime(timezone=True), nullable=False, index=True)
     number_of_guests = Column(Integer, nullable=False, default=1)
+    number_of_adults = Column(Integer, nullable=True, default=None)  # Number of adults
+    number_of_children = Column(Integer, nullable=True, default=None)  # Number of children
     total_amount = Column(Float, nullable=False)
     status = Column(SQLEnum(BookingStatus), default=BookingStatus.PENDING, index=True)
     payment_status = Column(SQLEnum(PaymentStatus), default=PaymentStatus.PENDING)

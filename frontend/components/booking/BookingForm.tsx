@@ -8,11 +8,15 @@ import api from '@/lib/api';
 import { Room } from '@/types';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
+import { hotelContent } from '@/lib/content/hotel-content';
+import Link from 'next/link';
 
 const bookingSchema = z.object({
   check_in_date: z.string().min(1, 'Check-in date is required'),
   check_out_date: z.string().min(1, 'Check-out date is required'),
   number_of_guests: z.number().min(1).max(10),
+  number_of_adults: z.number().min(1).max(10).optional(),
+  number_of_children: z.number().min(0).max(10).optional(),
   guest_name: z.string().min(2, 'Name is required'),
   guest_email: z.string().email('Invalid email'),
   guest_phone: z.string().optional(),
@@ -38,6 +42,7 @@ export function BookingForm({ room, initialCheckIn, initialCheckOut }: BookingFo
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<BookingFormData>({
     resolver: zodResolver(bookingSchema),
@@ -45,14 +50,26 @@ export function BookingForm({ room, initialCheckIn, initialCheckOut }: BookingFo
       check_in_date: initialCheckIn || '',
       check_out_date: initialCheckOut || '',
       number_of_guests: 1,
+      number_of_adults: 1,
+      number_of_children: 0,
     },
   });
 
   const checkIn = watch('check_in_date');
   const checkOut = watch('check_out_date');
+  const numberOfGuests = watch('number_of_guests');
+  const numberOfAdults = watch('number_of_adults') || 1;
+  const numberOfChildren = watch('number_of_children') || 0;
   const guestName = watch('guest_name');
   const guestEmail = watch('guest_email');
   const guestPhone = watch('guest_phone');
+
+  // Update adults when guests change
+  useEffect(() => {
+    if (numberOfGuests && !numberOfAdults) {
+      setValue('number_of_adults', numberOfGuests);
+    }
+  }, [numberOfGuests, numberOfAdults, setValue]);
 
   useEffect(() => {
     if (checkIn && checkOut) {
@@ -60,10 +77,31 @@ export function BookingForm({ room, initialCheckIn, initialCheckOut }: BookingFo
       const checkOutDate = new Date(checkOut);
       if (checkOutDate > checkInDate) {
         const nights = Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24));
-        setTotalAmount(nights * room.room_type.base_price);
+        
+        // Calculate base amount
+        let baseAmount = nights * room.room_type.base_price;
+        let extraAmount = 0;
+        
+        // Determine base occupancy
+        const isFamilyRoom = room.room_type.name.includes('Family Room');
+        const baseOccupancy = isFamilyRoom ? 4 : 2; // Quad for Family, Double for others
+        
+        // Calculate extra adults
+        const totalAdults = numberOfAdults || numberOfGuests;
+        if (totalAdults > baseOccupancy && room.room_type.extra_adult_price) {
+          const extraAdults = totalAdults - baseOccupancy;
+          extraAmount += extraAdults * room.room_type.extra_adult_price * nights;
+        }
+        
+        // Calculate children charges
+        if (numberOfChildren > 0 && room.room_type.child_price) {
+          extraAmount += numberOfChildren * room.room_type.child_price * nights;
+        }
+        
+        setTotalAmount(baseAmount + extraAmount);
       }
     }
-  }, [checkIn, checkOut, room.room_type.base_price]);
+  }, [checkIn, checkOut, room.room_type, numberOfAdults, numberOfChildren, numberOfGuests]);
 
   const today = new Date().toISOString().split('T')[0];
 
@@ -154,6 +192,7 @@ export function BookingForm({ room, initialCheckIn, initialCheckOut }: BookingFo
             min={today}
             className="w-full px-4 py-3 bg-gray-50/50 border border-gray-200/60 rounded-2xl text-[17px] text-gray-900 focus:outline-none focus:ring-0 focus:border-[#007aff]/40 focus:bg-white transition-all duration-300 ease-out"
           />
+          <p className="mt-1 text-[12px] text-gray-500">Time: {hotelContent.policies.checkIn.time}</p>
           {errors.check_in_date && (
             <p className="mt-2 text-[13px] text-red-600 font-medium px-1">{errors.check_in_date.message}</p>
           )}
@@ -171,6 +210,7 @@ export function BookingForm({ room, initialCheckIn, initialCheckOut }: BookingFo
             min={checkIn || today}
             className="w-full px-4 py-3 bg-gray-50/50 border border-gray-200/60 rounded-2xl text-[17px] text-gray-900 focus:outline-none focus:ring-0 focus:border-[#007aff]/40 focus:bg-white transition-all duration-300 ease-out"
           />
+          <p className="mt-1 text-[12px] text-gray-500">Time: {hotelContent.policies.checkOut.time}</p>
           {errors.check_out_date && (
             <p className="mt-2 text-[13px] text-red-600 font-medium px-1">{errors.check_out_date.message}</p>
           )}
@@ -180,7 +220,7 @@ export function BookingForm({ room, initialCheckIn, initialCheckOut }: BookingFo
       {/* Number of Guests */}
       <div>
         <label className="block text-[13px] text-gray-500 uppercase tracking-wide font-medium mb-2">
-          Guests (max {room.room_type.max_occupancy})
+          Total Guests (max {room.room_type.max_occupancy})
         </label>
         <input
           type="number"
@@ -192,6 +232,41 @@ export function BookingForm({ room, initialCheckIn, initialCheckOut }: BookingFo
         {errors.number_of_guests && (
           <p className="mt-2 text-[13px] text-red-600 font-medium px-1">{errors.number_of_guests.message}</p>
         )}
+      </div>
+
+      {/* Adults and Children Breakdown */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-[13px] text-gray-500 uppercase tracking-wide font-medium mb-2">
+            Adults
+          </label>
+          <input
+            type="number"
+            {...register('number_of_adults', { valueAsNumber: true })}
+            min={1}
+            max={room.room_type.max_occupancy}
+            className="w-full px-4 py-3 bg-gray-50/50 border border-gray-200/60 rounded-2xl text-[17px] text-gray-900 focus:outline-none focus:ring-0 focus:border-[#007aff]/40 focus:bg-white transition-all duration-300 ease-out"
+          />
+          {errors.number_of_adults && (
+            <p className="mt-2 text-[13px] text-red-600 font-medium px-1">{errors.number_of_adults.message}</p>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-[13px] text-gray-500 uppercase tracking-wide font-medium mb-2">
+            Children (0-12 years)
+          </label>
+          <input
+            type="number"
+            {...register('number_of_children', { valueAsNumber: true })}
+            min={0}
+            max={room.room_type.max_occupancy}
+            className="w-full px-4 py-3 bg-gray-50/50 border border-gray-200/60 rounded-2xl text-[17px] text-gray-900 focus:outline-none focus:ring-0 focus:border-[#007aff]/40 focus:bg-white transition-all duration-300 ease-out"
+          />
+          {errors.number_of_children && (
+            <p className="mt-2 text-[13px] text-red-600 font-medium px-1">{errors.number_of_children.message}</p>
+          )}
+        </div>
       </div>
 
       {/* Guest Information */}
@@ -278,24 +353,92 @@ export function BookingForm({ room, initialCheckIn, initialCheckOut }: BookingFo
       </div>
 
       {/* Total Amount */}
-      {totalAmount > 0 && (
-        <div className="bg-gray-50/50 rounded-2xl p-6 border border-gray-100/60">
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <span className="text-[15px] text-gray-600 font-light">Price per night</span>
-              <span className="text-[17px] font-medium text-gray-900">₹{room.room_type.base_price.toLocaleString('en-IN')}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-[15px] text-gray-600 font-light">{nights} {nights === 1 ? 'night' : 'nights'}</span>
-              <span className="text-[15px] text-gray-600 font-light">× {nights}</span>
-            </div>
-            <div className="pt-4 border-t border-gray-200/60 flex justify-between items-center">
-              <span className="text-[17px] font-semibold text-gray-900">Total</span>
-              <span className="text-[28px] font-semibold text-gray-900 tracking-tight">₹{totalAmount.toLocaleString('en-IN')}</span>
+      {totalAmount > 0 && (() => {
+        const nights = checkIn && checkOut
+          ? Math.ceil((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / (1000 * 60 * 60 * 24))
+          : 0;
+        
+        const isFamilyRoom = room.room_type.name.includes('Family Room');
+        const baseOccupancy = isFamilyRoom ? 4 : 2;
+        const baseAmount = nights * room.room_type.base_price;
+        const totalAdults = numberOfAdults || numberOfGuests;
+        const extraAdults = totalAdults > baseOccupancy ? totalAdults - baseOccupancy : 0;
+        const extraAdultsAmount = extraAdults > 0 && room.room_type.extra_adult_price
+          ? extraAdults * room.room_type.extra_adult_price * nights
+          : 0;
+        const childrenAmount = numberOfChildren > 0 && room.room_type.child_price
+          ? numberOfChildren * room.room_type.child_price * nights
+          : 0;
+        
+        return (
+          <div className="bg-gray-50/50 rounded-2xl p-6 border border-gray-100/60">
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="text-[15px] text-gray-600 font-light">
+                  Base price ({isFamilyRoom ? 'Quad' : 'Double'} occupancy)
+                </span>
+                <span className="text-[17px] font-medium text-gray-900">₹{room.room_type.base_price.toLocaleString('en-IN')}/night</span>
+              </div>
+              {extraAdults > 0 && room.room_type.extra_adult_price && (
+                <div className="flex justify-between items-center">
+                  <span className="text-[15px] text-gray-600 font-light">
+                    Extra Adult{extraAdults > 1 ? 's' : ''} ({extraAdults} × ₹{room.room_type.extra_adult_price.toLocaleString('en-IN')}/night)
+                  </span>
+                  <span className="text-[15px] font-medium text-gray-900">₹{extraAdultsAmount.toLocaleString('en-IN')}</span>
+                </div>
+              )}
+              {numberOfChildren > 0 && room.room_type.child_price && (
+                <div className="flex justify-between items-center">
+                  <span className="text-[15px] text-gray-600 font-light">
+                    Child{numberOfChildren > 1 ? 'ren' : ''} ({numberOfChildren} × ₹{room.room_type.child_price.toLocaleString('en-IN')}/night)
+                  </span>
+                  <span className="text-[15px] font-medium text-gray-900">₹{childrenAmount.toLocaleString('en-IN')}</span>
+                </div>
+              )}
+              <div className="flex justify-between items-center pt-2">
+                <span className="text-[15px] text-gray-600 font-light">{nights} {nights === 1 ? 'night' : 'nights'}</span>
+                <span className="text-[15px] text-gray-600 font-light">× {nights}</span>
+              </div>
+              <div className="pt-4 border-t border-gray-200/60 flex justify-between items-center">
+                <span className="text-[17px] font-semibold text-gray-900">Total</span>
+                <span className="text-[28px] font-semibold text-gray-900 tracking-tight">₹{totalAmount.toLocaleString('en-IN')}</span>
+              </div>
             </div>
           </div>
+        );
+      })()}
+
+      {/* Policies Information */}
+      <div className="bg-blue-50/50 rounded-2xl p-6 border border-blue-100/60 space-y-4">
+        <h3 className="text-[17px] font-semibold text-gray-900">Important Information</h3>
+        
+        <div className="space-y-3 text-[14px] text-gray-700">
+          <div>
+            <p className="font-medium text-gray-900 mb-1">Cancellation Policy:</p>
+            <p>{hotelContent.policies.cancellation.description}</p>
+          </div>
+          
+          <div>
+            <p className="font-medium text-gray-900 mb-1">Child Policy:</p>
+            <p>{hotelContent.policies.childPolicy.description}</p>
+          </div>
+
+          <div>
+            <p className="font-medium text-gray-900 mb-1">Important Notes:</p>
+            <ul className="list-disc list-inside space-y-1 ml-2">
+              <li>Valid ID proof required for check-in (Local ID not accepted)</li>
+              <li>Meal Plan: {hotelContent.property.mealPlan}</li>
+            </ul>
+          </div>
         </div>
-      )}
+
+        <p className="text-[13px] text-gray-600">
+          By proceeding, you agree to our{' '}
+          <Link href="/terms" className="text-[#007aff] hover:underline font-medium">
+            Terms & Conditions
+          </Link>
+        </p>
+      </div>
 
       {/* Submit Button */}
       <button

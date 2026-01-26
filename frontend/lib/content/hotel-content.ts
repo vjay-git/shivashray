@@ -1,28 +1,76 @@
 /**
  * Hotel Marketing Content
- * Based on factual information from shivashraybanaras.com
+ * Based on official property information
  * DO NOT modify with assumptions - only use verified information
  */
 
 export const hotelContent = {
   // Basic Information
-  name: 'Shivashray Banaras',
+  name: 'Shiv Ashray',
   tagline: 'Premier Lodging in the Heart of Varanasi',
-  description: 'A seamless blend of tradition and spiritual serenity in the spiritual capital of India.',
+  description: 'Varanasi.',
   
   // Location
   location: {
-    address: '25/14, Kachaudi Gali, Lahori Tola, Varanasi, Uttar Pradesh 221001',
+    address: 'Shiv Ashray, 25/14, Kachaudi Gali, Lahori Tola, Varanasi, Uttar Pradesh, India - 221001',
     city: 'Varanasi',
     state: 'Uttar Pradesh',
+    pincode: '221001',
+    googleMapsUrl: 'https://maps.app.goo.gl/nGkDab58p3uh257E9',
     proximity: 'Conveniently located near the Kashi Vishwanath Temple, allowing easy access to sacred sites along the Ghats of the Ganges',
   },
 
   // Contact
   contact: {
     phone: '+91 9369353505',
-    email: 'reservation@shivashray.com',
-    reservationEmail: 'reservation@shivashray.com',
+    email: 'shivashrayvns@gmail.com',
+    reservationEmail: 'shivashrayvns@gmail.com',
+    contactPerson: 'Shalini Agarwal',
+    website: 'https://shivashraybanaras.com/',
+  },
+
+  // Property Details
+  property: {
+    gstin: '09AFFFS9330B1Z0',
+    builtYear: 2025,
+    renovationYear: 2025,
+    totalFloors: 3,
+    totalRooms: 25,
+    mealPlan: 'EP Only', // European Plan - Room only, no meals
+  },
+
+  // Hotel Policies
+  policies: {
+    checkIn: {
+      time: '12:00 PM',
+      description: 'Check-in time is 12:00 PM',
+    },
+    checkOut: {
+      time: '11:00 AM',
+      description: 'Check-out time is 11:00 AM',
+    },
+    cancellation: {
+      policy: '3 Days Cancellation',
+      description: 'Cancellation must be made at least 3 days prior to check-in date for a full refund',
+    },
+    childPolicy: {
+      description: '0-5 Years Free, 6-12 Years as a child, Above 12 Years as an adult',
+      details: [
+        'Children aged 0-5 years stay free of charge',
+        'Children aged 6-12 years are charged as a child',
+        'Children above 12 years are charged as an adult',
+      ],
+    },
+    termsAndConditions: [
+      'Valid ID proof is required for check-in for every guest',
+      'Checkout must be done on or before checkout time',
+      'Local ID not accepted',
+      'Unmarried couples not allowed',
+      'Pets not allowed',
+      'Non-vegetarian food not allowed on premises',
+      'Smoking in rooms not allowed',
+      'Liquor consumption not allowed',
+    ],
   },
 
   // Room Types
@@ -47,28 +95,40 @@ export const hotelContent = {
   // Amenities
   amenities: [
     {
-      name: 'In-Room Dining',
-      description: 'Experience gourmet dining in the comfort of your room with our in-room dining service.',
+      name: 'Reception',
+      description: '24/7 reception desk for your convenience and assistance.',
     },
     {
-      name: 'Spa & Wellness',
-      description: 'Indulge in relaxation at our state-of-the-art spa with a range of treatments.',
+      name: 'Lobby',
+      description: 'Spacious and welcoming lobby area for guests.',
     },
     {
-      name: 'Fitness Center',
-      description: 'Stay active during your stay with access to our fully equipped fitness center.',
+      name: 'Power Backup',
+      description: 'Uninterrupted power supply with backup generator.',
     },
     {
-      name: 'Valet Parking',
-      description: 'Arrive in style with our valet parking service provided by our professional team.',
+      name: 'WiFi',
+      description: 'Complimentary high-speed WiFi available throughout the property.',
     },
     {
-      name: 'Pet-Friendly Services',
-      description: 'Enjoy hassle-free travel with our pet-friendly accommodations.',
+      name: 'CCTV in Common Area',
+      description: '24/7 security surveillance in common areas for your safety.',
     },
     {
-      name: 'Complimentary Wi-Fi',
-      description: 'Stay connected with our high-speed Wi-Fi available throughout the hotel.',
+      name: 'Fire Safety',
+      description: 'Fully equipped with fire safety systems and equipment.',
+    },
+    {
+      name: 'Doctor on Call',
+      description: 'Medical assistance available with doctor on call service.',
+    },
+    {
+      name: 'First Aid Kit',
+      description: 'First aid facilities available for emergency medical needs.',
+    },
+    {
+      name: 'Lift',
+      description: 'Elevator access available for easy movement between floors.',
     },
   ],
 
@@ -81,7 +141,7 @@ export const hotelContent = {
     },
     about: {
       mission: 'To provide exceptional hospitality services that exceed our guests\' expectations while maintaining the highest standards of comfort, cleanliness, and service.',
-      story: 'Shivashray Banaras is a premier lodging hotel located in the heart of Varanasi, offering a seamless blend of tradition and spiritual serenity. Our personalized services ensure a memorable stay whether you\'re here for pilgrimage, spiritual experiences, or a tranquil retreat.',
+      story: 'Shiv Ashray is a premier lodging hotel located in the heart of Varanasi, offering a seamless blend of tradition and spiritual serenity. Built in 2025, our 3-floor property with 25 thoughtfully designed rooms ensures a memorable stay whether you\'re here for pilgrimage, spiritual experiences, or a tranquil retreat.',
       values: [
         {
           title: 'Spiritual Connection',
@@ -99,7 +159,7 @@ export const hotelContent = {
     },
     services: {
       headline: 'Premium Services for Your Comfort',
-      description: 'Discover the range of world-class services we offer to make your stay at Shivashray Banaras truly memorable and exceptional.',
+      description: 'Discover the range of world-class services we offer to make your stay at Shiv Ashray truly memorable and exceptional.',
     },
   },
 
@@ -107,14 +167,15 @@ export const hotelContent = {
   social: {
     instagram: {
       captions: [
-        'Experience the perfect blend of tradition and spiritual serenity at Shivashray Banaras. Located in the heart of Varanasi, just steps away from the Kashi Vishwanath Temple. Book your stay today! 🕉️✨',
+        'Experience the perfect blend of tradition and spiritual serenity at Shiv Ashray. Located in the heart of Varanasi, just steps away from the Kashi Vishwanath Temple. Book your stay today! 🕉️✨',
         'Whether you\'re here for a pilgrimage, Ganga Aarti, or a tranquil retreat, our personalized services ensure a memorable stay. Discover comfort and spirituality in one place. 🏨🙏',
-        'From cozy Double Rooms to spacious suites, find your perfect accommodation in Varanasi. All rooms feature modern amenities while maintaining the spiritual essence of the holy city. 🛏️',
-        'Indulge in gourmet in-room dining, relax at our spa, stay active at our fitness center, or simply enjoy our pet-friendly accommodations. Everything you need for a perfect stay! 🍽️💆‍♀️',
-        'Located at 25/14, Kachaudi Gali, Lahori Tola - just moments away from the sacred Ghats of the Ganges. Your spiritual journey begins here. 📍🌊',
+        'From Deluxe Rooms to Super Deluxe and Family Rooms, find your perfect accommodation in Varanasi. All 25 rooms feature modern amenities while maintaining the spiritual essence of the holy city. 🛏️',
+        'Enjoy our premium amenities including Reception, Lobby, Power Backup, WiFi, CCTV, Fire Safety, Doctor on Call, First Aid, and Lift. Everything you need for a comfortable stay! 🏨✨',
+        'Located at Shiv Ashray, 25/14, Kachaudi Gali, Lahori Tola - just moments away from the sacred Ghats of the Ganges. Your spiritual journey begins here. 📍🌊',
       ],
       hashtags: [
-        '#ShivashrayBanaras',
+        '#ShivAshray',
+        '#ShivashrayVaranasi',
         '#VaranasiHotel',
         '#KashiVishwanath',
         '#GangaAarti',
@@ -127,39 +188,39 @@ export const hotelContent = {
       ],
     },
     whatsapp: {
-      greeting: 'Namaste! Welcome to Shivashray Banaras. How can we assist you today?',
-      booking: 'Thank you for choosing Shivashray Banaras! We\'re located at 25/14, Kachaudi Gali, Lahori Tola, Varanasi, just near the Kashi Vishwanath Temple. Our rooms include Double, Deluxe, and Spacious options, all with modern amenities. Would you like to check availability?',
-      amenities: 'Our amenities include: In-Room Dining, Spa & Wellness, Fitness Center, Valet Parking, Pet-Friendly Services, and Complimentary Wi-Fi throughout the hotel.',
-      location: 'We\'re conveniently located at 25/14, Kachaudi Gali, Lahori Tola, Varanasi, Uttar Pradesh 221001. We\'re just steps away from the Kashi Vishwanath Temple and the sacred Ghats of the Ganges.',
-      contact: 'You can reach us at:\n📞 Phone: +91 9369353505\n📧 Email: reservation@shivashray.com\n📍 Address: 25/14, Kachaudi Gali, Lahori Tola, Varanasi, UP 221001',
+      greeting: 'Namaste! Welcome to Shiv Ashray. How can we assist you today?',
+      booking: 'Thank you for choosing Shiv Ashray! We\'re located at Shiv Ashray, 25/14, Kachaudi Gali, Lahori Tola, Varanasi, just near the Kashi Vishwanath Temple. Our rooms include Deluxe, Super Deluxe, and Family Room options, all with modern amenities. Would you like to check availability?',
+      amenities: 'Our amenities include: Reception, Lobby, Power Backup, WiFi, CCTV in Common Area, Fire Safety, Doctor on Call, First Aid Kit, and Lift.',
+      location: 'We\'re conveniently located at Shiv Ashray, 25/14, Kachaudi Gali, Lahori Tola, Varanasi, Uttar Pradesh, India - 221001. We\'re just steps away from the Kashi Vishwanath Temple and the sacred Ghats of the Ganges.',
+      contact: 'You can reach us at:\n📞 Phone: +91 9369353505\n📧 Email: shivashrayvns@gmail.com\n👤 Contact Person: Shalini Agarwal\n📍 Address: Shiv Ashray, 25/14, Kachaudi Gali, Lahori Tola, Varanasi, UP 221001',
     },
   },
 
   // Ad Copy
   ads: {
     google: {
-      headline1: 'Shivashray Banaras - Premier Hotel in Varanasi',
+      headline1: 'Shiv Ashray - Premier Hotel in Varanasi',
       headline2: 'Near Kashi Vishwanath Temple | Spiritual Serenity',
-      headline3: 'Luxury Rooms | Modern Amenities | Personalized Service',
+      headline3: '25 Rooms | Modern Amenities | Personalized Service',
       description: 'Experience a seamless blend of tradition and spiritual serenity. Located in the heart of Varanasi, near sacred sites. Book your stay today!',
     },
     facebook: {
       headline: 'Your Spiritual Journey Starts Here',
-      description: 'Shivashray Banaras offers premier lodging in the heart of Varanasi. Whether you\'re here for pilgrimage, Ganga Aarti, or a tranquil retreat, our personalized services ensure a memorable stay. Book now!',
+      description: 'Shiv Ashray offers premier lodging in the heart of Varanasi. Whether you\'re here for pilgrimage, Ganga Aarti, or a tranquil retreat, our personalized services ensure a memorable stay. Book now!',
       cta: 'Book Your Stay',
     },
   },
 
   // Booking Descriptions
   booking: {
-    overview: 'Shivashray Banaras is a premier lodging hotel located in the heart of Varanasi, offering a seamless blend of tradition and spiritual serenity. Whether you\'re here for a pilgrimage to the Kashi Vishwanath Temple, an immersive Ganga Aarti experience, or simply seeking a tranquil retreat in the spiritual capital of India, our personalized services ensure a memorable stay.',
+    overview: 'Shiv Ashray is a premier lodging hotel located in the heart of Varanasi, offering a seamless blend of tradition and spiritual serenity. Built in 2025, our 3-floor property with 25 thoughtfully designed rooms ensures a memorable stay whether you\'re here for a pilgrimage to the Kashi Vishwanath Temple, an immersive Ganga Aarti experience, or simply seeking a tranquil retreat in the spiritual capital of India.',
     whyChoose: [
       'Prime location near Kashi Vishwanath Temple and Ganga Ghats',
-      'Personalized services tailored to your needs',
-      'Modern amenities with traditional hospitality',
-      'Pet-friendly accommodations',
-      'Complimentary high-speed Wi-Fi throughout',
-      'In-room dining, spa, and fitness center',
+      '25 well-appointed rooms across 3 floors',
+      'Modern amenities including WiFi, Power Backup, CCTV, Fire Safety',
+      '24/7 Reception and Doctor on Call service',
+      'Check-in: 12 PM | Check-out: 11 AM',
+      '3 Days Cancellation Policy',
     ],
   },
 };
@@ -171,6 +232,8 @@ export const {
   description: hotelDescription,
   location,
   contact,
+  property,
+  policies,
   rooms,
   amenities,
   marketing,
