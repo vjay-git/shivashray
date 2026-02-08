@@ -14,7 +14,7 @@ export function Hero() {
   const hasTwoParts = nameParts.length > 1;
 
   return (
-    <section className="relative min-h-[100svh] flex flex-col justify-end overflow-hidden">
+    <section className="relative min-h-[100svh] flex flex-col justify-start overflow-hidden -mt-20 sm:-mt-24 lg:mt-0">
       {/* Full-width immersive background */}
       <div className="absolute inset-0 z-0">
         <Image
@@ -37,7 +37,7 @@ export function Hero() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 md:pb-24">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 lg:pt-8 pb-16 md:pb-24">
         <div className="max-w-3xl">
           {/* Editorial hero heading – two-line serif + sacred divider + tagline */}
           <div className="mb-6 md:mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out fill-mode-both [animation-delay:120ms]">
