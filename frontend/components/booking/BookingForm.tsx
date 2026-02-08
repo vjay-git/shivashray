@@ -371,9 +371,9 @@ export function BookingForm({ room, initialCheckIn, initialCheckOut }: BookingFo
           : 0;
         
         return (
-          <div className="bg-gray-50/50 rounded-2xl p-6 border border-gray-100/60">
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
+        <div className="bg-gray-50/50 rounded-2xl p-6 border border-gray-100/60">
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
                 <span className="text-[15px] text-gray-600 font-light">
                   Base price ({isFamilyRoom ? 'Quad' : 'Double'} occupancy)
                 </span>
@@ -385,10 +385,10 @@ export function BookingForm({ room, initialCheckIn, initialCheckOut }: BookingFo
                     Extra Adult{extraAdults > 1 ? 's' : ''} ({extraAdults} × ₹{room.room_type.extra_adult_price.toLocaleString('en-IN')}/night)
                   </span>
                   <span className="text-[15px] font-medium text-gray-900">₹{extraAdultsAmount.toLocaleString('en-IN')}</span>
-                </div>
+            </div>
               )}
               {numberOfChildren > 0 && room.room_type.child_price && (
-                <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center">
                   <span className="text-[15px] text-gray-600 font-light">
                     Child{numberOfChildren > 1 ? 'ren' : ''} ({numberOfChildren} × ₹{room.room_type.child_price.toLocaleString('en-IN')}/night)
                   </span>
@@ -396,15 +396,15 @@ export function BookingForm({ room, initialCheckIn, initialCheckOut }: BookingFo
                 </div>
               )}
               <div className="flex justify-between items-center pt-2">
-                <span className="text-[15px] text-gray-600 font-light">{nights} {nights === 1 ? 'night' : 'nights'}</span>
-                <span className="text-[15px] text-gray-600 font-light">× {nights}</span>
-              </div>
-              <div className="pt-4 border-t border-gray-200/60 flex justify-between items-center">
-                <span className="text-[17px] font-semibold text-gray-900">Total</span>
-                <span className="text-[28px] font-semibold text-gray-900 tracking-tight">₹{totalAmount.toLocaleString('en-IN')}</span>
-              </div>
+              <span className="text-[15px] text-gray-600 font-light">{nights} {nights === 1 ? 'night' : 'nights'}</span>
+              <span className="text-[15px] text-gray-600 font-light">× {nights}</span>
+            </div>
+            <div className="pt-4 border-t border-gray-200/60 flex justify-between items-center">
+              <span className="text-[17px] font-semibold text-gray-900">Total</span>
+              <span className="text-[28px] font-semibold text-gray-900 tracking-tight">₹{totalAmount.toLocaleString('en-IN')}</span>
             </div>
           </div>
+        </div>
         );
       })()}
 

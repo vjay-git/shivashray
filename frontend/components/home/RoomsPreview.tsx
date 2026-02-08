@@ -206,61 +206,63 @@ export function RoomsPreview() {
   }
 
   return (
-    <section className="py-24 md:py-32 bg-white relative overflow-hidden">
+    <section className="py-20 md:py-28 bg-[#F8F6F2] relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        {/* Section Header */}
-        <div 
-          className={`text-center mb-16 transition-all duration-1000 ease-out ${
+        {/* Section Header – serif title */}
+        <div
+          className={`text-center mb-14 md:mb-16 transition-all duration-1000 ease-out ${
             mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}
         >
-          <h2 className="text-[48px] md:text-[56px] font-semibold text-gray-900 mb-4 tracking-tight">
+          <h2
+            className="text-[36px] sm:text-[44px] md:text-[52px] font-normal text-[#0E1A2B] mb-4 tracking-tight"
+            style={{ fontFamily: 'var(--font-playfair-display), Georgia, serif' }}
+          >
             Our Rooms
           </h2>
-          <p className="text-[21px] text-gray-600 font-light max-w-2xl mx-auto">
+          <p className="text-[17px] md:text-[18px] text-[#2F5D62] font-normal max-w-2xl mx-auto">
             Thoughtfully designed spaces for your comfort
           </p>
         </div>
 
-        {/* Rooms Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* Rooms Grid – gold hover outline, soft shadow */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
           {roomTypes.map((roomType, index) => (
             <Link
               key={roomType.id}
               href="/rooms"
               ref={(el) => { itemRefs.current[index] = el as HTMLDivElement | null; }}
-              className={`group bg-white/70 backdrop-blur-sm rounded-[28px] overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.08)] border border-gray-100/60 hover:shadow-[0_12px_48px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all duration-500 ease-out ${
+              className={`group bg-[#F5F1E8] rounded-[14px] overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.06)] border border-[#C6A75E]/10 hover:shadow-[0_20px_60px_rgba(0,0,0,0.1)] hover:ring-2 hover:ring-[#C6A75E]/30 hover:ring-offset-2 hover:ring-offset-[#F8F6F2] hover:-translate-y-0.5 transition-all duration-500 ease-out ${
                 visibleItems.has(index) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
               }`}
-              style={{
-                transitionDelay: `${index * 100}ms`,
-              }}
+              style={{ transitionDelay: `${index * 100}ms` }}
             >
-              {/* Image Slideshow */}
               <RoomCardSlideshow roomTypeName={roomType.name} roomId={roomType.id} />
 
-              {/* Content */}
-              <div className="p-8">
-                <h3 className="text-[24px] font-semibold text-gray-900 mb-2 tracking-tight">
+              <div className="p-6 md:p-8">
+                <h3
+                  className="text-[22px] md:text-[24px] font-semibold text-[#0E1A2B] mb-2 tracking-tight"
+                  style={{ fontFamily: 'var(--font-playfair-display), Georgia, serif' }}
+                >
                   {roomType.name}
                 </h3>
                 {roomType.description && (
-                  <p className="text-[15px] text-gray-600 font-light mb-4 leading-relaxed line-clamp-2">
+                  <p className="text-[15px] text-[#2F5D62] font-normal mb-4 leading-relaxed line-clamp-2">
                     {roomType.description}
                   </p>
                 )}
-                <div className="pt-4 border-t border-gray-100/60 space-y-3">
+                <div className="pt-4 border-t border-[#C6A75E]/15 space-y-3">
                   <div>
-                    <p className="text-[13px] text-gray-500 uppercase tracking-wide font-medium mb-1">
+                    <p className="text-[12px] text-[#2F5D62] uppercase tracking-wider font-medium mb-1">
                       {roomType.name.includes('Family Room') ? 'Quad Occupancy' : 'Double Occupancy'}
                     </p>
-                    <p className="text-[21px] font-semibold text-gray-900">
+                    <p className="text-[20px] font-semibold text-[#0E1A2B]">
                       ₹{roomType.base_price.toLocaleString('en-IN')}
-                      <span className="text-[15px] font-normal text-gray-600">/night</span>
+                      <span className="text-[15px] font-normal text-[#2F5D62]">/night</span>
                     </p>
                   </div>
                   {(roomType.extra_adult_price || roomType.child_price) && (
-                    <div className="text-[12px] text-gray-500 space-y-1">
+                    <div className="text-[13px] text-[#2F5D62] space-y-1">
                       {roomType.extra_adult_price && (
                         <p>Extra Adult: ₹{roomType.extra_adult_price.toLocaleString('en-IN')}/night</p>
                       )}
@@ -269,13 +271,11 @@ export function RoomsPreview() {
                       )}
                     </div>
                   )}
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 pt-2">
-                    <div className="flex items-center text-[#007aff] font-medium text-[14px]">
-                      <span>View Details</span>
-                      <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </div>
+                  <div className="pt-2 flex items-center text-[#C6A75E] font-medium text-[14px] group-hover:text-[#0E1A2B] transition-colors">
+                    <span>View Details</span>
+                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
                   </div>
                 </div>
               </div>
@@ -283,11 +283,10 @@ export function RoomsPreview() {
           ))}
         </div>
 
-        {/* View All Link */}
         <div className="text-center mt-12">
           <Link
             href="/rooms"
-            className="inline-flex items-center space-x-2 text-[17px] font-medium text-gray-900 hover:text-[#007aff] transition-colors duration-300"
+            className="inline-flex items-center space-x-2 text-[17px] font-medium text-[#0E1A2B] hover:text-[#C6A75E] transition-colors duration-300"
           >
             <span>View all rooms</span>
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

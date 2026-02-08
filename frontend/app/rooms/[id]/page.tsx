@@ -5,9 +5,23 @@ import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { Room } from '@/types';
 import Image from 'next/image';
+import Link from 'next/link';
 import { BookingForm } from '@/components/booking/BookingForm';
 import { useAuthStore } from '@/lib/store';
-import { getRoomTypeImage, getAllRoomImages } from '@/lib/utils/room-images';
+import { getRoomTypeImage, getAllRoomImages, getRoomTypeImages } from '@/lib/utils/room-images';
+import { PremiumBackground } from '@/components/layout/PremiumBackground';
+
+const GOLD = '#D4AF37';
+
+function SacredAccent() {
+  return (
+    <div className="flex items-center justify-center gap-3 py-6 md:py-8" aria-hidden>
+      <div className="h-px w-12 bg-gradient-to-r from-transparent via-slate-300/50 to-slate-300/50 dark:via-slate-500/30 dark:to-slate-500/30" />
+      <div className="w-1 h-1 rounded-full bg-slate-400/40 dark:bg-slate-500/30" />
+      <div className="h-px w-12 bg-gradient-to-l from-transparent via-slate-300/50 to-slate-300/50 dark:via-slate-500/30 dark:to-slate-500/30" />
+    </div>
+  );
+}
 
 export default function RoomDetailPage() {
   const params = useParams();
@@ -30,8 +44,8 @@ export default function RoomDetailPage() {
     try {
       const response = await api.get(`/rooms/${params.id}`);
       setRoom(response.data);
-    } catch (error) {
-      console.error('Error fetching room:', error);
+    } catch {
+      setRoom(null);
     } finally {
       setLoading(false);
     }
@@ -39,202 +53,206 @@ export default function RoomDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#f5f5f7]">
-        <div className="flex flex-col items-center space-y-4">
-          <div className="w-12 h-12 border-4 border-gray-200 border-t-gray-900 rounded-full animate-spin"></div>
-          <p className="text-[15px] text-gray-600 font-light">Loading room details...</p>
+      <PremiumBackground variant="rooms">
+        <div className="min-h-screen flex flex-col items-center justify-center">
+          <div className="w-10 h-10 border-2 border-slate-200 dark:border-slate-600 border-t-[#D4AF37] rounded-full animate-spin mb-4" />
+          <p className="text-[15px] text-slate-500 dark:text-slate-400 font-light">Loading room...</p>
         </div>
-      </div>
+      </PremiumBackground>
     );
   }
 
   if (!room) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#f5f5f7]">
-        <div className="text-center">
-          <p className="text-[17px] text-gray-600 font-light mb-4">Room not found</p>
-          <button
-            onClick={() => router.push('/rooms')}
-            className="px-6 py-3 bg-gray-900 text-white text-[15px] font-medium rounded-2xl hover:bg-gray-800 active:scale-[0.98] transition-all duration-300 ease-out"
+      <PremiumBackground variant="rooms">
+        <div className="min-h-screen flex flex-col items-center justify-center px-6">
+          <p className="text-[17px] text-slate-600 dark:text-slate-400 font-light mb-6">Room not found</p>
+          <Link
+            href="/rooms"
+            className="inline-flex items-center justify-center px-6 py-3 rounded-2xl font-medium text-[15px] transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+            style={{ background: GOLD, color: '#0F1115' }}
           >
             Back to Rooms
-          </button>
+          </Link>
         </div>
-      </div>
+      </PremiumBackground>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-[#f5f5f7] relative overflow-hidden">
-      {/* Subtle Background Mesh */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-[#007aff]/2 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-1/4 w-[500px] h-[500px] bg-[#5856d6]/2 rounded-full blur-3xl"></div>
-      </div>
+  const images =
+    room.image_urls?.length
+      ? room.image_urls
+      : [getRoomTypeImage(room.room_type.name, room.id), ...getRoomTypeImages(room.room_type.name).slice(1, 5), ...getAllRoomImages().slice(0, 2)].filter(Boolean);
+  const currentImage = images[selectedImageIndex] || images[0];
 
-      <div className="relative z-10">
-        {/* Hero Image Section */}
-        <section className="relative h-[60vh] md:h-[70vh] overflow-hidden">
-          {(() => {
-            const images = room.image_urls && room.image_urls.length > 0 
-              ? room.image_urls 
-              : [getRoomTypeImage(room.room_type.name, room.id), ...getAllRoomImages().slice(0, 3)];
-            const currentImage = images[selectedImageIndex] || images[0];
-            
-            return (
-              <>
-                <Image
-                  src={currentImage}
-                  alt={room.room_number}
-                  fill
-                  priority
-                  quality={100}
-                  className="object-cover transition-opacity duration-500"
-                  sizes="100vw"
-                />
-                {/* Image Gallery Navigation */}
-                {images.length > 1 && (
-                  <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center space-x-2">
-                    {images.map((_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setSelectedImageIndex(index)}
-                        className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                          selectedImageIndex === index
-                            ? 'bg-white w-8'
-                            : 'bg-white/50 hover:bg-white/75'
-                        }`}
-                        aria-label={`View image ${index + 1}`}
-                      />
-                    ))}
-                  </div>
-                )}
-              </>
-            );
-          })()}
-          {/* Subtle Overlay */}
-          <div className="absolute inset-0 bg-black/20"></div>
-          
-          {/* Back Button */}
-          <div className="absolute top-6 left-6 z-20">
-            <button
-              onClick={() => router.back()}
-              className="w-12 h-12 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white flex items-center justify-center transition-all duration-300 ease-out active:scale-95 shadow-lg"
+  return (
+    <PremiumBackground variant="rooms">
+      <div className="relative z-0">
+        {/* Hero – full-width room image, gradient overlay, serif headline */}
+        <section className="relative h-[50vh] min-h-[300px] md:h-[58vh] overflow-hidden">
+          <Image
+            src={currentImage}
+            alt={room.room_number}
+            fill
+            priority
+            quality={95}
+            className="object-cover transition-opacity duration-500"
+            sizes="100vw"
+          />
+          <div
+            className="absolute inset-0"
+            style={{
+              background: 'linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.45) 50%, rgba(0,0,0,0.65) 100%)',
+            }}
+          />
+          <div className="absolute inset-0 flex flex-col justify-end pb-10 md:pb-14 px-6 md:px-10 lg:px-12">
+            <div
+              className={`max-w-4xl transition-all duration-600 ease-out ${
+                mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+              }`}
             >
-              <svg className="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
+              <h1
+                className="text-3xl md:text-4xl lg:text-5xl font-light text-white tracking-tight mb-2"
+                style={{ fontFamily: 'var(--font-playfair-display), Georgia, serif' }}
+              >
+                {room.room_type.name}
+              </h1>
+              <p className="text-base md:text-lg text-white/90 font-light">Room {room.room_number} · Your sanctuary in the heart of Varanasi</p>
+            </div>
+          </div>
+          <div className="absolute top-6 left-6 z-10">
+            <button
+              type="button"
+              onClick={() => router.back()}
+              className="w-12 h-12 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm hover:bg-white dark:hover:bg-slate-800 flex items-center justify-center transition-all duration-200 active:scale-95 shadow-lg text-slate-800 dark:text-slate-200"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
             </button>
           </div>
+          {images.length > 1 && (
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2">
+              {images.slice(0, 6).map((_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setSelectedImageIndex(i)}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    selectedImageIndex === i ? 'w-6 bg-white' : 'w-1.5 bg-white/50 hover:bg-white/75'
+                  }`}
+                  aria-label={`Image ${i + 1}`}
+                />
+              ))}
+            </div>
+          )}
         </section>
 
-        {/* Content Section */}
-        <section className="max-w-7xl mx-auto px-6 lg:px-8 -mt-16 md:-mt-24 pb-24 md:pb-32 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Main Content */}
-            <div className="lg:col-span-2 space-y-8">
-              {/* Room Header */}
+        <SacredAccent />
+
+        {/* Main content: gallery left, info + booking right */}
+        <section className="max-w-7xl mx-auto px-6 lg:px-8 -mt-0 pb-20 md:pb-28">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+            {/* Left: Image gallery – main + thumbnails */}
+            <div className="lg:col-span-7 space-y-4">
               <div
-                className={`bg-white/70 backdrop-blur-2xl rounded-[32px] p-8 md:p-12 shadow-[0_8px_32px_rgba(0,0,0,0.08)] border border-white/20 transition-all duration-1000 ease-out ${
-                  mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                className={`rounded-[18px] overflow-hidden bg-white/90 dark:bg-slate-800/70 border border-slate-200/50 dark:border-slate-700/40 shadow-[0_8px_32px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.15)] transition-all duration-600 ease-out ${
+                  mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
                 }`}
               >
-                <div className="mb-6">
-                  <h1 className="text-[40px] md:text-[48px] font-semibold text-gray-900 mb-3 tracking-tight">
-                    {room.room_type.name}
-                  </h1>
-                  <p className="text-[17px] text-gray-600 font-light mb-2">Room {room.room_number}</p>
-                  {room.floor && (
-                    <p className="text-[15px] text-gray-500 font-light">Floor {room.floor}</p>
-                  )}
+                <div className="relative aspect-[4/3] md:aspect-[16/10]">
+                  <Image
+                    src={currentImage}
+                    alt={room.room_number}
+                    fill
+                    className="object-cover transition-opacity duration-300"
+                    sizes="(max-width: 1024px) 100vw, 58vw"
+                  />
                 </div>
-
-                {room.description && (
-                  <p className="text-[19px] text-gray-700 font-light leading-relaxed mb-8">
-                    {room.description}
-                  </p>
-                )}
-
-                {/* Key Details */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-8 border-t border-gray-100/60">
-                  <div>
-                    <p className="text-[13px] text-gray-500 uppercase tracking-wide font-medium mb-2">Capacity</p>
-                    <p className="text-[21px] font-semibold text-gray-900">
-                      {room.room_type.max_occupancy}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-[13px] text-gray-500 uppercase tracking-wide font-medium mb-2">
-                      {room.room_type.name.includes('Family Room') ? 'Quad Price' : 'Double Price'}
-                    </p>
-                    <p className="text-[21px] font-semibold text-gray-900">
-                      ₹{room.room_type.base_price.toLocaleString('en-IN')}
-                    </p>
-                    <p className="text-[13px] text-gray-500 font-light">per night</p>
-                  </div>
-                  <div>
-                    <p className="text-[13px] text-gray-500 uppercase tracking-wide font-medium mb-2">Type</p>
-                    <p className="text-[17px] font-medium text-gray-900">{room.room_type.name}</p>
-                  </div>
-                  <div>
-                    <p className="text-[13px] text-gray-500 uppercase tracking-wide font-medium mb-2">Status</p>
-                    <span className={`inline-block px-3 py-1.5 rounded-xl text-[13px] font-medium ${
-                      room.is_active
-                        ? 'bg-emerald-50/80 text-emerald-700 border border-emerald-200/60'
-                        : 'bg-rose-50/80 text-rose-700 border border-rose-200/60'
-                    }`}>
-                      {room.is_active ? 'Available' : 'Unavailable'}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Additional Pricing Information */}
-                {(room.room_type.extra_adult_price || room.room_type.child_price) && (
-                  <div className="mt-6 pt-6 border-t border-gray-100/60">
-                    <p className="text-[15px] text-gray-500 uppercase tracking-wide font-medium mb-4">Additional Pricing</p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {room.room_type.extra_adult_price && (
-                        <div className="bg-gray-50/50 rounded-xl p-4 border border-gray-100/60">
-                          <p className="text-[13px] text-gray-600 font-light mb-1">Extra Adult</p>
-                          <p className="text-[19px] font-semibold text-gray-900">
-                            ₹{room.room_type.extra_adult_price.toLocaleString('en-IN')}
-                            <span className="text-[14px] font-normal text-gray-600">/night</span>
-                          </p>
-                        </div>
-                      )}
-                      {room.room_type.child_price && (
-                        <div className="bg-gray-50/50 rounded-xl p-4 border border-gray-100/60">
-                          <p className="text-[13px] text-gray-600 font-light mb-1">Child (0-12 years)</p>
-                          <p className="text-[19px] font-semibold text-gray-900">
-                            ₹{room.room_type.child_price.toLocaleString('en-IN')}
-                            <span className="text-[14px] font-normal text-gray-600">/night</span>
-                          </p>
-                        </div>
-                      )}
-                    </div>
+                {images.length > 1 && (
+                  <div className="p-4 flex gap-2 overflow-x-auto scrollbar-hide">
+                    {images.slice(0, 8).map((src, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => setSelectedImageIndex(i)}
+                        className={`relative flex-shrink-0 w-20 h-14 rounded-xl overflow-hidden border-2 transition-all duration-200 ${
+                          selectedImageIndex === i
+                            ? 'border-[#D4AF37] ring-1 ring-[#D4AF37]/30'
+                            : 'border-transparent hover:border-slate-300 dark:hover:border-slate-600'
+                        }`}
+                      >
+                        <Image src={src} alt="" fill className="object-cover" sizes="80px" />
+                      </button>
+                    ))}
                   </div>
                 )}
               </div>
 
-              {/* Amenities Section */}
+              {/* Room description + details block */}
+              <div
+                className={`rounded-[18px] p-6 md:p-8 bg-white/90 dark:bg-slate-800/70 border border-slate-200/50 dark:border-slate-700/40 shadow-[0_8px_32px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.15)] transition-all duration-600 ease-out ${
+                  mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+                }`}
+                style={{ transitionDelay: '80ms' }}
+              >
+                <h2
+                  className="text-xl md:text-2xl font-light text-slate-900 dark:text-slate-100 mb-4 tracking-tight"
+                  style={{ fontFamily: 'var(--font-playfair-display), Georgia, serif' }}
+                >
+                  About this room
+                </h2>
+                {room.description ? (
+                  <p className="text-[16px] md:text-[17px] text-slate-600 dark:text-slate-300 font-light leading-relaxed mb-6">{room.description}</p>
+                ) : (
+                  <p className="text-[16px] text-slate-600 dark:text-slate-300 font-light leading-relaxed mb-6">{room.room_type.description}</p>
+                )}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-6 border-t border-slate-200/60 dark:border-slate-600/40">
+                  <div>
+                    <p className="text-[12px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-medium mb-1">Guests</p>
+                    <p className="text-[18px] font-medium text-slate-900 dark:text-slate-100">{room.room_type.max_occupancy}</p>
+                  </div>
+                  <div>
+                    <p className="text-[12px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-medium mb-1">Price / night</p>
+                    <p className="text-[20px] font-semibold" style={{ color: GOLD }}>₹{room.room_type.base_price.toLocaleString('en-IN')}</p>
+                  </div>
+                  <div>
+                    <p className="text-[12px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-medium mb-1">Room</p>
+                    <p className="text-[16px] font-medium text-slate-900 dark:text-slate-100">{room.room_number}</p>
+                  </div>
+                  <div>
+                    <p className="text-[12px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-medium mb-1">Status</p>
+                    <span className={`inline-block px-3 py-1.5 rounded-xl text-[13px] font-medium ${room.is_active ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : 'bg-slate-200/60 text-slate-600 dark:text-slate-400'}`}>
+                      {room.is_active ? 'Available' : 'Unavailable'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Amenities – clean grid, thin icons */}
               {room.amenities && room.amenities.length > 0 && (
                 <div
-                  className={`bg-white/70 backdrop-blur-2xl rounded-[32px] p-8 md:p-12 shadow-[0_8px_32px_rgba(0,0,0,0.08)] border border-white/20 transition-all duration-1000 ease-out ${
-                    mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                  className={`rounded-[18px] p-6 md:p-8 bg-white/90 dark:bg-slate-800/70 border border-slate-200/50 dark:border-slate-700/40 shadow-[0_8px_32px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.15)] transition-all duration-600 ease-out ${
+                    mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
                   }`}
-                  style={{ transitionDelay: '100ms' }}
+                  style={{ transitionDelay: '120ms' }}
                 >
-                  <h2 className="text-[32px] font-semibold text-gray-900 mb-8 tracking-tight">Amenities</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {room.amenities.map((amenity) => (
+                  <h2
+                    className="text-xl md:text-2xl font-light text-slate-900 dark:text-slate-100 mb-6 tracking-tight"
+                    style={{ fontFamily: 'var(--font-playfair-display), Georgia, serif' }}
+                  >
+                    Amenities
+                  </h2>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {room.amenities.map((a) => (
                       <div
-                        key={amenity.id}
-                        className="flex items-center space-x-3 p-4 rounded-2xl bg-gray-50/50 hover:bg-gray-100/50 transition-colors duration-300"
+                        key={a.id}
+                        className="flex items-center gap-3 py-3 border-b border-slate-200/40 dark:border-slate-600/30 last:border-0"
                       >
-                        {amenity.icon && (
-                          <span className="text-2xl">{amenity.icon}</span>
-                        )}
-                        <span className="text-[17px] text-gray-900 font-light">{amenity.name}</span>
+                        <span className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-slate-500 dark:text-slate-400">
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </span>
+                        <span className="text-[15px] font-light text-slate-700 dark:text-slate-300">{a.name}</span>
                       </div>
                     ))}
                   </div>
@@ -242,15 +260,28 @@ export default function RoomDetailPage() {
               )}
             </div>
 
-            {/* Booking Sidebar */}
-            <div className="lg:col-span-1">
+            {/* Right: Sticky booking panel – glassmorphic, gold CTA */}
+            <div className="lg:col-span-5">
               <div
-                className={`bg-white/70 backdrop-blur-2xl rounded-[32px] p-8 shadow-[0_8px_32px_rgba(0,0,0,0.08)] border border-white/20 sticky top-8 transition-all duration-1000 ease-out ${
-                  mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                className={`sticky top-24 rounded-[18px] p-6 md:p-8 bg-white/80 dark:bg-slate-800/70 backdrop-blur-xl border border-slate-200/50 dark:border-slate-700/40 shadow-[0_8px_32px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.2)] transition-all duration-600 ease-out hover:shadow-[0_12px_40px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_12px_40px_rgba(0,0,0,0.25)] ${
+                  mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
                 }`}
-                style={{ transitionDelay: '200ms' }}
+                style={{ transitionDelay: '160ms' }}
               >
-                <h2 className="text-[28px] font-semibold text-gray-900 mb-6 tracking-tight">Book This Room</h2>
+                <h2
+                  className="text-2xl font-light text-slate-900 dark:text-slate-100 mb-2 tracking-tight"
+                  style={{ fontFamily: 'var(--font-playfair-display), Georgia, serif' }}
+                >
+                  {room.room_type.name}
+                </h2>
+                <p className="text-[15px] text-slate-500 dark:text-slate-400 font-light mb-6">Room {room.room_number}</p>
+                <div className="mb-6 pb-6 border-b border-slate-200/60 dark:border-slate-600/40">
+                  <p className="text-[12px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-medium mb-1">From</p>
+                  <p className="text-2xl md:text-3xl font-semibold" style={{ color: GOLD }}>
+                    ₹{room.room_type.base_price.toLocaleString('en-IN')}
+                    <span className="text-[16px] font-normal text-slate-500 dark:text-slate-400">/night</span>
+                  </p>
+                </div>
                 {isAuthenticated ? (
                   <BookingForm
                     room={room}
@@ -259,22 +290,37 @@ export default function RoomDetailPage() {
                   />
                 ) : (
                   <div className="space-y-6">
-                    <p className="text-[17px] text-gray-600 font-light leading-relaxed">
-                      Please login to book this room.
+                    <p className="text-[16px] text-slate-600 dark:text-slate-400 font-light leading-relaxed">
+                      Sign in to check availability and book this room.
                     </p>
-                    <button
-                      onClick={() => router.push('/login')}
-                      className="w-full px-6 py-4 bg-gray-900 text-white text-[17px] font-semibold rounded-2xl hover:bg-gray-800 active:scale-[0.98] transition-all duration-300 ease-out shadow-lg shadow-black/10"
+                    <Link
+                      href="/login"
+                      className="block w-full py-4 rounded-2xl font-semibold text-[16px] text-center transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                      style={{ background: GOLD, color: '#0F1115' }}
                     >
-                      Login to Book
-                    </button>
+                      Sign in to Book
+                    </Link>
                   </div>
                 )}
               </div>
             </div>
           </div>
         </section>
+
+        {/* Testimonial snippet */}
+        <SacredAccent />
+        <section className="max-w-4xl mx-auto px-6 lg:px-8 pb-20 md:pb-28">
+          <blockquote className="rounded-[18px] p-8 md:p-10 text-center bg-white/60 dark:bg-slate-800/60 backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.15)] border border-slate-200/50 dark:border-slate-700/40">
+            <p
+              className="text-lg md:text-xl font-light text-slate-700 dark:text-slate-300 leading-relaxed mb-4"
+              style={{ fontFamily: 'var(--font-playfair-display), Georgia, serif' }}
+            >
+              “Quiet, clean, and steps from the ghats. Exactly what we needed for our stay in Kashi.”
+            </p>
+            <footer className="text-[14px] text-slate-500 dark:text-slate-400 font-light">— Guest, Shivashray</footer>
+          </blockquote>
+        </section>
       </div>
-    </div>
+    </PremiumBackground>
   );
 }

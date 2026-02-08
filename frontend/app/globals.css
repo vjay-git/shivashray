@@ -3,10 +3,83 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ─────────────────────────────────────────────────────────────────────────
+   LUXURY TYPOGRAPHY SYSTEM – Shivashray
+   Two families only: Cormorant Garamond (headings), Inter (body & UI)
+   Usage: Navbar → .typo-nav or font-sans text-[15px] font-medium tracking-[0.02em]
+          Hero → .typo-hero .font-serif (serif, light, 48–72px)
+          Section titles → .typo-h1 .font-serif (serif, 400, 28–40px)
+          Subsection → .typo-h2 (sans, medium, 18–22px)
+          Body → default or .typo-body-lg (16–18px, line-height 1.75–1.85)
+          Cards (titles) → .font-serif + weight 400; (body) → default sans
+          Forms (labels) → .typo-caption; (inputs/buttons) → .typo-btn / default
+   Weights: Avoid bold; use serif/sans contrast. Never Black/ExtraBold.
+   Responsive: Hero/H1 scale up at md/lg; body and nav stay consistent.
+   Dark/Light: text-slate-900 / dark:text-slate-100; secondary slate-500/400.
+   ───────────────────────────────────────────────────────────────────────── */
+
 @theme inline {
+  /* Font families */
+  --font-serif: var(--font-cormorant), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  /* Backward compat: existing components use --font-playfair-display */
+  --font-playfair-display: var(--font-serif);
+
+  /* Typography scale – luxury editorial */
+  --text-hero: 3rem;        /* 48px mobile – hero headline, serif 300 */
+  --text-hero-md: 3.5rem;   /* 56px tablet */
+  --text-hero-lg: 4.5rem;   /* 72px desktop */
+  --text-h1: 2rem;          /* 32px – section titles, serif 400 */
+  --text-h1-md: 2.25rem;    /* 36px */
+  --text-h1-lg: 2.5rem;     /* 40px */
+  --text-h2: 1.25rem;       /* 20px – subsection, sans medium */
+  --text-h2-md: 1.375rem;   /* 22px */
+  --text-body: 1rem;        /* 16px – body, sans regular */
+  --text-body-lg: 1.125rem; /* 18px */
+  --text-nav: 0.9375rem;    /* 15px – navigation */
+  --text-ui: 1rem;          /* 16px – buttons, inputs */
+  --text-caption: 0.875rem; /* 14px – labels, captions */
+  --text-small: 0.75rem;    /* 12px – small labels, uppercase optional */
+
+  /* Line heights */
+  --leading-hero: 1.1;
+  --leading-tight: 1.2;
+  --leading-snug: 1.375;
+  --leading-body: 1.75;
+  --leading-relaxed: 1.85;
+
+  /* Letter spacing – large serif: slight negative; UI: slight positive */
+  --tracking-hero: -0.02em;
+  --tracking-tight: -0.01em;
+  --tracking-ui: 0.02em;
+  --tracking-wide: 0.05em;
+
+  /* Luxury palette */
+  --color-luxury-midnight: #0E1A2B;
+  --color-luxury-charcoal: #0F1115;
+  --color-luxury-ivory: #F5F1E8;
+  --color-luxury-warm-white: #F8F6F2;
+  --color-luxury-gold: #C6A75E;
+  --color-luxury-champagne: #D4AF37;
+  --color-luxury-teal: #2F5D62;
+  --color-luxury-emerald: #0F3D3E;
+  --color-luxury-gold-muted: rgba(198, 167, 94, 0.15);
+
+  /* Legacy scale aliases */
+  --text-display: var(--text-hero-lg);
+
+  /* Spacing – 8pt grid, breathing room */
+  --section-padding-y: 5rem;
+  --section-padding-y-lg: 6.5rem;
+  --content-gap: 1.5rem;
+  --radius-card: 14px;
+  --radius-button: 12px;
+  --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.08);
+  --shadow-card: 0 12px 40px rgba(0, 0, 0, 0.1);
+  --shadow-elevated: 0 20px 60px rgba(0, 0, 0, 0.12);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -121,6 +194,80 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+  }
+}
+
+/* Luxury typography utilities – serif for headings, sans for UI */
+@layer utilities {
+  .font-serif {
+    font-family: var(--font-serif);
+  }
+  /* Hero headline: serif, light, large, tight tracking */
+  .typo-hero {
+    font-family: var(--font-serif);
+    font-weight: 300;
+    font-size: var(--text-hero);
+    line-height: var(--leading-hero);
+    letter-spacing: var(--tracking-hero);
+  }
+  @media (min-width: 768px) {
+    .typo-hero { font-size: var(--text-hero-md); }
+  }
+  @media (min-width: 1024px) {
+    .typo-hero { font-size: var(--text-hero-lg); }
+  }
+  /* Section title: serif, regular */
+  .typo-h1 {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    font-size: var(--text-h1);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-tight);
+  }
+  @media (min-width: 768px) {
+    .typo-h1 { font-size: var(--text-h1-md); }
+  }
+  @media (min-width: 1024px) {
+    .typo-h1 { font-size: var(--text-h1-lg); }
+  }
+  /* Subsection: sans, medium */
+  .typo-h2 {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: var(--text-h2);
+    line-height: var(--leading-snug);
+  }
+  @media (min-width: 768px) {
+    .typo-h2 { font-size: var(--text-h2-md); }
+  }
+  /* Body large */
+  .typo-body-lg {
+    font-family: var(--font-sans);
+    font-weight: 400;
+    font-size: var(--text-body-lg);
+    line-height: var(--leading-relaxed);
+  }
+  /* Nav / UI */
+  .typo-nav {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: var(--text-nav);
+    letter-spacing: var(--tracking-ui);
+  }
+  /* Buttons: medium, never bold */
+  .typo-btn {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    letter-spacing: 0.03em;
+  }
+  /* Small labels */
+  .typo-caption {
+    font-family: var(--font-sans);
+    font-size: var(--text-caption);
+    letter-spacing: var(--tracking-ui);
   }
 }
 

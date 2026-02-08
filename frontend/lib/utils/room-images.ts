@@ -67,7 +67,7 @@ export const getRoomTypeImages = (roomTypeName: string): string[] => {
     '/room9.png',
   ];
 };
-
+  
 export const getRoomTypeImage = (roomTypeName: string, index: number = 0): string => {
   const images = getRoomTypeImages(roomTypeName);
   return images[index % images.length];

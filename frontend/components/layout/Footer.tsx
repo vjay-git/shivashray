@@ -80,13 +80,12 @@ export function Footer() {
   ];
 
   return (
-    <footer className={`bg-gray-50 border-t border-gray-200 transition-all duration-300 ${
-      isCollapsed ? 'lg:pl-20' : 'lg:pl-64'
-    }`}>
-      <div className="max-w-7xl mx-auto px-6 py-12 md:py-16">
-        {/* Main Footer Content */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 md:gap-12 mb-10">
-          {/* Brand Section */}
+    <footer
+      className={`transition-all duration-300 ${isCollapsed ? 'lg:pl-[88px]' : 'lg:pl-[296px]'}`}
+      style={{ background: '#0E1A2B' }}
+    >
+      <div className="max-w-7xl mx-auto px-6 py-14 md:py-18">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 md:gap-12 mb-12">
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="inline-block mb-4">
               <Image
@@ -94,19 +93,19 @@ export function Footer() {
                 alt={hotelContent.name}
                 width={160}
                 height={60}
-                className="h-12 w-auto object-contain mb-4"
+                className="h-12 w-auto object-contain mb-4 brightness-0 invert opacity-95"
                 priority
               />
             </Link>
-            <p className="text-sm text-gray-600 leading-relaxed mb-6">
+            <p className="text-sm text-[#F8F6F2]/70 leading-relaxed mb-6">
               {hotelContent.description}
             </p>
-            <div className="flex space-x-4">
+            <div className="flex space-x-5">
               {socialLinks.map((social) => (
                 <a
                   key={social.name}
                   href={social.href}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                  className="text-[#C6A75E]/80 hover:text-[#C6A75E] transition-colors"
                   aria-label={social.name}
                 >
                   {social.icon}
@@ -115,15 +114,14 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Explore */}
           <div>
-            <h3 className="text-sm font-semibold text-gray-900 mb-4">Explore</h3>
+            <h3 className="text-[13px] font-semibold text-[#F8F6F2] uppercase tracking-wider mb-4">Explore</h3>
             <ul className="space-y-3">
               {footerLinks.explore.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                    className="text-sm text-[#F8F6F2]/70 hover:text-[#C6A75E] transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -132,15 +130,14 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Support */}
           <div>
-            <h3 className="text-sm font-semibold text-gray-900 mb-4">Support</h3>
+            <h3 className="text-[13px] font-semibold text-[#F8F6F2] uppercase tracking-wider mb-4">Support</h3>
             <ul className="space-y-3">
               {footerLinks.support.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                    className="text-sm text-[#F8F6F2]/70 hover:text-[#C6A75E] transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -149,14 +146,13 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Contact */}
           <div>
-            <h3 className="text-sm font-semibold text-gray-900 mb-4">Contact</h3>
+            <h3 className="text-[13px] font-semibold text-[#F8F6F2] uppercase tracking-wider mb-4">Contact</h3>
             <ul className="space-y-3">
               <li>
                 <a
                   href={`tel:${hotelContent.contact.phone.replace(/\s/g, '')}`}
-                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                  className="text-sm text-[#F8F6F2]/70 hover:text-[#C6A75E] transition-colors"
                 >
                   {hotelContent.contact.phone}
                 </a>
@@ -164,13 +160,13 @@ export function Footer() {
               <li>
                 <a
                   href={`mailto:${hotelContent.contact.reservationEmail}`}
-                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors break-all"
+                  className="text-sm text-[#F8F6F2]/70 hover:text-[#C6A75E] transition-colors break-all"
                 >
                   {hotelContent.contact.reservationEmail}
                 </a>
               </li>
               <li>
-                <p className="text-sm text-gray-600 leading-relaxed">
+                <p className="text-sm text-[#F8F6F2]/70 leading-relaxed">
                   {hotelContent.location.address}
                 </p>
               </li>
@@ -178,14 +174,13 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="border-t border-gray-200 pt-8">
+        <div className="border-t border-[#F8F6F2]/10 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="flex flex-col space-y-2">
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-[#F8F6F2]/60">
                 Copyright &copy; {currentYear} {hotelContent.name}. All rights reserved.
               </p>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-[#F8F6F2]/40">
                 GSTIN: {hotelContent.property.gstin} | Built {hotelContent.property.builtYear} | {hotelContent.property.totalRooms} Rooms | {hotelContent.property.totalFloors} Floors
               </p>
             </div>
@@ -194,7 +189,7 @@ export function Footer() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="text-sm text-gray-500 hover:text-gray-900 transition-colors"
+                  className="text-sm text-[#F8F6F2]/60 hover:text-[#C6A75E] transition-colors"
                 >
                   {link.label}
                 </Link>
@@ -202,13 +197,13 @@ export function Footer() {
             </div>
           </div>
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-[#F8F6F2]/40">
               Designed and developed by{' '}
               <a
                 href="https://workwithvijay.netlify.app"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-medium text-gray-600 hover:text-gray-900 transition-colors underline"
+                className="font-medium text-[#C6A75E]/80 hover:text-[#C6A75E] transition-colors"
               >
                 workwithvijay.netlify.app
               </a>

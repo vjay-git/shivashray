@@ -18,6 +18,21 @@ export const hotelContent = {
     pincode: '221001',
     googleMapsUrl: 'https://maps.app.goo.gl/nGkDab58p3uh257E9',
     proximity: 'Conveniently located near the Kashi Vishwanath Temple, allowing easy access to sacred sites along the Ghats of the Ganges',
+    // City center highlights
+    cityCenter: true,
+    highlights: [
+      'Iconic tourist destinations at your doorstep',
+      'Famous street food lanes nearby',
+      'Saree wholesale market very close',
+    ],
+    walkable: {
+      description: 'Ganga Ghat, Kal Bhairav and Vishwanath Mandir are all within walkable distance. Staying here you don\'t need vehicles — everything is 2–5 minutes away.',
+      landmarks: [
+        { name: 'Ganga Ghat', time: '2–5 min' },
+        { name: 'Kal Bhairav', time: '2–5 min' },
+        { name: 'Vishwanath Mandir', time: '2–5 min' },
+      ],
+    },
   },
 
   // Contact
@@ -95,6 +110,22 @@ export const hotelContent = {
   // Amenities
   amenities: [
     {
+      name: 'Lift',
+      description: 'Elevator access available for easy movement between floors.',
+    },
+    {
+      name: '24-Hour Hot Water',
+      description: 'Centralized hot water available round the clock.',
+    },
+    {
+      name: 'Centralized AC',
+      description: 'Air conditioning throughout for your comfort.',
+    },
+    {
+      name: 'Smart Doors',
+      description: 'Modern smart door access for security and convenience.',
+    },
+    {
       name: 'Reception',
       description: '24/7 reception desk for your convenience and assistance.',
     },
@@ -126,10 +157,14 @@ export const hotelContent = {
       name: 'First Aid Kit',
       description: 'First aid facilities available for emergency medical needs.',
     },
-    {
-      name: 'Lift',
-      description: 'Elevator access available for easy movement between floors.',
-    },
+  ],
+  // Key property highlights (for hero / marketing)
+  propertyHighlights: [
+    'Lift available',
+    '24-hour hot water',
+    'Centralized AC and centralized hot water',
+    'Smart doors',
+    'All latest amenities',
   ],
 
   // Marketing Messages
@@ -213,14 +248,14 @@ export const hotelContent = {
 
   // Booking Descriptions
   booking: {
-    overview: 'Shiv Ashray is a premier lodging hotel located in the heart of Varanasi, offering a seamless blend of tradition and spiritual serenity. Built in 2025, our 3-floor property with 25 thoughtfully designed rooms ensures a memorable stay whether you\'re here for a pilgrimage to the Kashi Vishwanath Temple, an immersive Ganga Aarti experience, or simply seeking a tranquil retreat in the spiritual capital of India.',
+    overview: 'Shiv Ashray is a premier lodging hotel in the city center of Varanasi, offering a seamless blend of tradition and spiritual serenity. Iconic tourist destinations, famous street food and the saree wholesale market are very near. Ganga Ghat, Kal Bhairav and Vishwanath Mandir are all within walkable distance (2–5 min) — no vehicle required. Built in 2025, our property has lift, 24-hour hot water, centralized AC, smart doors and all latest amenities.',
     whyChoose: [
-      'Prime location near Kashi Vishwanath Temple and Ganga Ghats',
-      '25 well-appointed rooms across 3 floors',
-      'Modern amenities including WiFi, Power Backup, CCTV, Fire Safety',
-      '24/7 Reception and Doctor on Call service',
-      'Check-in: 12 PM | Check-out: 11 AM',
-      '3 Days Cancellation Policy',
+      'City center — iconic destinations, street food and saree wholesale market nearby',
+      'Ganga Ghat, Kal Bhairav & Vishwanath Mandir walkable in 2–5 min; no vehicle needed',
+      'Lift, 24-hour hot water, centralized AC, smart doors',
+      '25 well-appointed rooms with all latest amenities',
+      '24/7 Reception and Doctor on Call',
+      'Check-in: 12 PM | Check-out: 11 AM | 3 Days Cancellation',
     ],
   },
 };

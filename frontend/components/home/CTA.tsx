@@ -12,27 +12,21 @@ export function CTA() {
   }, []);
 
   return (
-    <section className="py-24 md:py-32 bg-[#f5f5f7] relative overflow-hidden">
-      {/* Subtle Background Mesh */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-[#007aff]/2 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-1/4 w-[500px] h-[500px] bg-[#5856d6]/2 rounded-full blur-3xl"></div>
-      </div>
-
-      <div className="relative z-10 max-w-4xl mx-auto px-6 lg:px-8 text-center">
+    <section className="py-16 md:py-20 bg-[#F5F1E8] relative overflow-hidden">
+      <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
         <div
           className={`transition-all duration-1000 ease-out ${
             mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}
         >
-          <p className="text-[28px] md:text-[32px] text-gray-900 font-light leading-relaxed mb-8">
-            We invite you to experience a place where tradition meets tranquility, where every moment is designed to honor your journey.
+          <p className="text-[20px] md:text-[22px] text-[#0E1A2B] font-normal leading-relaxed mb-8 max-w-2xl mx-auto">
+            Ready to book? We look forward to welcoming you.
           </p>
           <Link
             href="/rooms"
-            className="inline-block px-8 py-4 bg-gray-900 text-white text-[17px] font-semibold rounded-2xl hover:bg-gray-800 active:scale-[0.98] transition-all duration-300 ease-out shadow-lg shadow-black/10"
+            className="inline-flex items-center justify-center px-8 py-4 min-h-[52px] bg-[#C6A75E] text-[#0E1A2B] text-base font-semibold rounded-[12px] transition-all duration-300 hover:bg-[#D4AF37] hover:shadow-[0_12px_40px_rgba(198,167,94,0.3)] active:scale-[0.98]"
           >
-            Begin Your Journey
+            Book Your Stay
           </Link>
         </div>
       </div>

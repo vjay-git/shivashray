@@ -113,69 +113,47 @@ export function Features() {
   return (
     <section
       ref={sectionRef}
-      className="relative py-24 md:py-32 lg:py-40"
-      style={{
-        background: 'linear-gradient(to bottom, #fefdfb 0%, #faf9f6 100%)',
-      }}
+      className="relative py-20 md:py-28 lg:py-32"
+      style={{ background: '#F8F6F2' }}
     >
-      {/* Very subtle gradient separation */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: 'linear-gradient(to bottom, transparent 0%, rgba(250, 249, 246, 0.3) 50%, transparent 100%)',
-        }}
-      />
-
       <div className="relative z-10 max-w-[1440px] mx-auto px-6 sm:px-8 md:px-10 lg:px-12 xl:px-16">
-        {/* Header - Simple, Clear Hierarchy */}
+        {/* Serif section title – luxury hierarchy */}
         <div
-          className={`mb-16 md:mb-20 lg:mb-24 transition-opacity duration-1000 ease-out ${
+          className={`mb-14 md:mb-16 lg:mb-20 transition-opacity duration-1000 ease-out ${
             isVisible ? 'opacity-100' : 'opacity-0'
           }`}
         >
           <h2
-            className="text-[40px] sm:text-[48px] md:text-[56px] lg:text-[64px] font-light text-[#1d1a16] leading-[1.1] tracking-[-0.015em] mb-4"
-            style={{
-              fontFamily: 'system-ui, -apple-system, "SF Pro Display", sans-serif',
-              fontWeight: 300,
-            }}
+            className="text-[36px] sm:text-[44px] md:text-[52px] font-normal text-[#0E1A2B] leading-[1.1] tracking-tight mb-4"
+            style={{ fontFamily: 'var(--font-playfair-display), Georgia, serif' }}
           >
-            Our Spaces
+            Featured Spaces
           </h2>
-          <p
-            className="text-[18px] sm:text-[19px] md:text-[20px] text-[#5a5248] font-light leading-[1.6] max-w-[600px]"
-            style={{ letterSpacing: '-0.01em' }}
-          >
+          <p className="text-[17px] md:text-[18px] text-[#2F5D62] font-normal leading-[1.6] max-w-[560px]">
             Thoughtfully designed interiors that reflect the calm and elegance of Varanasi.
           </p>
         </div>
 
-        {/* Desktop: Clean Horizontal Gallery */}
+        {/* Desktop: Horizontal gallery with gold hover outline */}
         <div className="hidden lg:block">
           <div
             ref={galleryRef}
-            className="flex gap-8 overflow-x-auto scrollbar-hide"
-            style={{
-              scrollBehavior: 'smooth',
-              WebkitOverflowScrolling: 'touch',
-            }}
+            className="flex gap-6 overflow-x-auto scrollbar-hide pb-2"
+            style={{ scrollBehavior: 'smooth', WebkitOverflowScrolling: 'touch' }}
           >
             {galleryImages.map((image, index) => (
               <div
                 key={index}
-                className="flex-shrink-0 w-[560px] transition-opacity duration-1000 ease-out group"
-                style={{
-                  opacity: isVisible ? 1 : 0,
-                  transitionDelay: `${index * 100}ms`,
-                }}
+                className="flex-shrink-0 w-[520px] transition-opacity duration-1000 ease-out group"
+                style={{ opacity: isVisible ? 1 : 0, transitionDelay: `${index * 80}ms` }}
               >
-                <div className="relative aspect-[4/3] rounded-[24px] overflow-hidden shadow-[0_12px_48px_rgba(0,0,0,0.03)] group-hover:shadow-[0_16px_56px_rgba(0,0,0,0.05)] transition-shadow duration-500 ease-out">
+                <div className="relative aspect-[4/3] rounded-[14px] overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.08)] transition-all duration-500 ease-out group-hover:shadow-[0_20px_60px_rgba(0,0,0,0.12)] group-hover:ring-2 group-hover:ring-[#C6A75E]/40 group-hover:ring-offset-2 group-hover:ring-offset-[#F8F6F2]">
                   <Image
                     src={image.src}
                     alt={image.alt}
                     fill
-                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02]"
-                    sizes="560px"
+                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                    sizes="520px"
                     quality={100}
                     priority={index < 3}
                   />
@@ -190,20 +168,14 @@ export function Features() {
           <div
             ref={galleryRef}
             className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide -mx-6 sm:-mx-8"
-            style={{
-              scrollBehavior: 'smooth',
-              WebkitOverflowScrolling: 'touch',
-            }}
+            style={{ scrollBehavior: 'smooth', WebkitOverflowScrolling: 'touch' }}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
           >
             {galleryImages.map((image, index) => (
-              <div
-                key={index}
-                className="w-full flex-shrink-0 snap-center px-6 sm:px-8"
-              >
-                <div className="relative aspect-[4/3] rounded-[20px] overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.04)]">
+              <div key={index} className="w-full flex-shrink-0 snap-center px-6 sm:px-8">
+                <div className="relative aspect-[4/3] rounded-[14px] overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.08)]">
                   <Image
                     src={image.src}
                     alt={image.alt}
@@ -217,16 +189,12 @@ export function Features() {
               </div>
             ))}
           </div>
-
-          {/* Minimal Navigation Dots */}
-          <div className="flex justify-center gap-2 mt-8">
+          <div className="flex justify-center gap-2 mt-6">
             {galleryImages.map((_, index) => (
               <div
                 key={index}
                 className={`h-0.5 rounded-full transition-all duration-300 ${
-                  index === currentIndex
-                    ? 'w-6 bg-[#1d1a16]'
-                    : 'w-1.5 bg-[#c9c4bc]'
+                  index === currentIndex ? 'w-6 bg-[#0E1A2B]' : 'w-1.5 bg-[#2F5D62]/40'
                 }`}
               />
             ))}

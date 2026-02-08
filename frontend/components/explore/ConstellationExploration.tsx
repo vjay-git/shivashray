@@ -19,28 +19,20 @@ export function ConstellationExploration({ places }: ConstellationExplorationPro
     setMounted(true);
   }, []);
 
-  // Calculate positions for places around center with organic spacing
+  // Organic positioning: radial clusters + asymmetry (subtle imperfection)
   const getPlacePosition = (index: number, total: number) => {
-    // Organic, uneven spacing - not perfectly mechanical
-    const baseAngle = (index / total) * 2 * Math.PI - Math.PI / 2; // Start from top
-    const angleVariation = (Math.sin(index * 1.3) * 0.12); // Organic variation (reduced)
+    const baseAngle = (index / total) * 2 * Math.PI - Math.PI / 2;
+    const angleVariation = Math.sin(index * 1.3) * 0.18 + Math.cos(index * 0.5) * 0.08;
     const angle = baseAngle + angleVariation;
-    
-    // Varying radius for organic feel - adjusted for better fit
-    // Desktop: larger radius for better spacing
+
     const baseRadius = 280;
-    const radiusVariation = 20 + (Math.cos(index * 0.7) * 15); // Reduced variation
-    const radius = baseRadius + radiusVariation;
-    
+    const cluster = Math.floor(index / 2) * 8;
+    const asymmetry = 25 + Math.cos(index * 0.7) * 18 + Math.sin(index * 1.1) * 10;
+    const radius = baseRadius + cluster + asymmetry;
+
     const x = Math.cos(angle) * radius;
     const y = Math.sin(angle) * radius;
-    
-    return {
-      angle,
-      x,
-      y,
-      radius,
-    };
+    return { angle, x, y, radius };
   };
 
   // Generate curved path for energy connection
@@ -65,158 +57,60 @@ export function ConstellationExploration({ places }: ConstellationExplorationPro
   return (
     <div className="w-full min-h-screen py-8 md:py-16 lg:py-20 px-4 md:px-6 lg:px-8 relative">
       <style jsx>{`
-        @keyframes energyPulse {
-          0%, 100% {
-            opacity: 0.4;
-            stroke-width: 1.2;
-          }
-          50% {
-            opacity: 0.6;
-            stroke-width: 1.5;
-          }
-        }
-        @keyframes nodeGlow {
-          0%, 100% {
-            opacity: 0.4;
-          }
-          50% {
-            opacity: 0.7;
-          }
+        @keyframes slideUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
         }
         @keyframes centerPulse {
-          0%, 100% {
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.02);
-          }
-          50% {
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.03);
-          }
+          0%, 100% { opacity: 0.05; }
+          50% { opacity: 0.08; }
         }
-        @keyframes slideUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        @keyframes sacredNeonSpread {
-          0% {
-            stroke-opacity: 0.4;
-            stroke-width: 1.2;
-          }
-          100% {
-            stroke-opacity: 0.9;
-            stroke-width: 4;
-          }
-        }
-        @keyframes sacredNeonTravel {
-          0% {
-            stroke-dashoffset: 0;
-            opacity: 0;
-          }
-          10% {
-            opacity: 1;
-          }
-          90% {
-            opacity: 1;
-          }
-          100% {
-            stroke-dashoffset: -100%;
-            opacity: 0;
-          }
-        }
-        @keyframes sacredNodeGlow {
-          0% {
-            opacity: 1;
-            transform: scale(1);
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-          }
-          50% {
-            opacity: 1;
-            transform: scale(1.05);
-          }
-          100% {
-            opacity: 1;
-            transform: scale(1.05);
-          }
+        @keyframes particleTravel {
+          0% { stroke-dashoffset: 0; opacity: 1; }
+          100% { stroke-dashoffset: -1; opacity: 0.3; }
         }
       `}</style>
-      
-      {/* Mobile: Vertical Scroll List */}
-      <div className="md:hidden space-y-4 pb-8">
-        {/* Center - Shivashray */}
-        <div className="flex justify-center mb-8">
-              <div
-                className={`
-                  relative
-                  w-32 h-32
-                  rounded-full
-                  overflow-hidden
-                  bg-white/95 dark:bg-slate-800/80
-                  backdrop-blur-sm
-                  border border-slate-200/60 dark:border-slate-700/40
-                  flex items-center justify-center
-                  shadow-[0_4px_20px_rgba(0,0,0,0.06),0_0_0_1px_rgba(0,0,0,0.02)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2),0_0_0_1px_rgba(255,255,255,0.05)]
-                  transition-all duration-1000 ease-out
-                  ${mounted ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}
-                `}
-                role="img"
-                aria-label="Shivashray, the center"
-              >
+
+      {/* Mobile: vertical sacred thread + list */}
+      <div className="md:hidden relative space-y-4 pb-8">
+        {/* Vertical sacred thread – connects cards */}
+        <div
+          className="absolute left-6 top-[5.5rem] bottom-8 w-px pointer-events-none"
+          style={{
+            background: 'linear-gradient(to bottom, rgba(148,163,184,0.25) 0%, rgba(148,163,184,0.12) 50%, transparent 100%)',
+          }}
+        />
+        <div className="flex justify-center mb-8 relative z-10">
+          <div
+            className={`relative w-32 h-32 rounded-full overflow-hidden bg-white/95 dark:bg-slate-800/80 backdrop-blur-sm flex items-center justify-center shadow-[0_4px_20px_rgba(0,0,0,0.06)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] transition-all duration-500 ease-out ${
+              mounted ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+            }`}
+            style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.4)' }}
+            role="img"
+            aria-label="Shivashray, the center"
+          >
             <div className="absolute inset-0">
-              <Image
-                src="/shivashray.png"
-                alt="Shivashray - The Center"
-                fill
-                className="object-contain rounded-full p-3"
-                priority
-                sizes="128px"
-              />
+              <Image src="/shivashray.png" alt="Shivashray - The Center" fill className="object-contain rounded-full p-3" priority sizes="128px" />
             </div>
           </div>
         </div>
 
-        {/* Places List - Large Tap Targets */}
         {places.map((place, index) => (
-            <Link
-              key={place.id}
-              href={`/explore/${place.slug}`}
-              className={`
-                block
-                w-full
-                px-6 py-5
-                rounded-2xl
-                bg-white/90 dark:bg-slate-800/60
-                backdrop-blur-md
-                border border-slate-200/60 dark:border-slate-700/40
-                shadow-[0_2px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.15)]
-                active:bg-slate-50 dark:active:bg-slate-800/40
-                active:scale-[0.98]
-                transition-all duration-200 ease-out
-                focus:outline-none focus:ring-2 focus:ring-slate-400/40 dark:focus:ring-slate-600/40 focus:ring-offset-2
-                ${mounted ? 'opacity-100' : 'opacity-0'}
-              `}
-              style={{
-                animation: mounted ? `slideUp 0.5s ease-out ${index * 0.1}s both` : 'none'
-              }}
-              aria-label={`Explore ${place.name}`}
-            >
-              <h3 className="text-lg font-light text-slate-900 dark:text-slate-100 leading-tight">
-                {place.name}
-              </h3>
-              {place.description && (
-                <p className="text-sm text-slate-500 dark:text-slate-400 font-light mt-1.5 leading-relaxed line-clamp-2">
-                  {place.description}
-                </p>
-              )}
-              {place.distance && (
-                <p className="text-xs text-slate-400 dark:text-slate-500 font-light mt-2">
-                  {place.distance}
-                </p>
-              )}
-            </Link>
+          <Link
+            key={place.id}
+            href={`/explore/${place.slug}`}
+            className={`relative z-10 block w-full px-6 py-5 rounded-2xl backdrop-blur-md active:scale-[0.98] transition-all duration-[250ms] ease-out focus:outline-none focus:ring-2 focus:ring-slate-400/40 focus:ring-offset-2 bg-gradient-to-b from-white/95 to-white/88 dark:from-slate-800/90 dark:to-slate-800/70 shadow-[0_2px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.2)] [box-shadow:inset_0_1px_0_rgba(255,255,255,0.5)] dark:[box-shadow:0_2px_12px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.06)] ${
+              mounted ? 'opacity-100' : 'opacity-0'
+            }`}
+            style={{ animation: mounted ? `slideUp 0.5s ease-out ${index * 0.08}s both` : 'none' }}
+            aria-label={`Explore ${place.name}`}
+          >
+            <h3 className="text-lg font-light text-slate-900 dark:text-slate-100 leading-tight">{place.name}</h3>
+            {place.description && (
+              <p className="text-sm text-slate-500 dark:text-slate-400 font-light mt-1.5 leading-relaxed line-clamp-2">{place.description}</p>
+            )}
+            {place.distance && <p className="text-xs text-slate-400 dark:text-slate-500 font-light mt-2">{place.distance}</p>}
+          </Link>
         ))}
       </div>
 
@@ -288,103 +182,76 @@ export function ConstellationExploration({ places }: ConstellationExplorationPro
               // Curved path
               const path = getCurvedPath(centerX, centerY, placeX, placeY);
               
-              // Calculate approximate path length for animation
-              const dx = placeX - centerX;
-              const dy = placeY - centerY;
-              const pathLength = Math.sqrt(dx * dx + dy * dy) * 1.1; // Approximate with curve factor
-              
               return (
                 <g key={`energy-${place.id}`}>
-                  {/* Outer glow layer */}
+                  {/* Idle: static thin line. Hover: gradient transitions in 300ms */}
                   <path
                     d={path}
                     fill="none"
-                    stroke={isCenterHovered ? "url(#sacredNeonGradient)" : (isActive ? "url(#divineEnergy)" : "url(#dimmedEnergy)")}
-                    strokeWidth={isCenterHovered ? 4 : (isActive ? 3 : 2)}
-                    strokeOpacity={isCenterHovered ? 0.9 : (isActive ? 0.5 : 0.4)}
-                    filter={isCenterHovered ? "url(#sacredNeonGlow)" : "url(#energyGlow)"}
-                    className="transition-all duration-1000 ease-out"
-                    style={isCenterHovered ? {
-                      animation: `sacredNeonSpread ${1.5 + (index * 0.1)}s ease-out forwards`,
-                      animationDelay: `${index * 0.05}s`
-                    } : {}}
-                    aria-hidden="true"
-                  />
-                  {/* Main connection line - always visible */}
-                  <path
-                    d={path}
-                    fill="none"
-                    stroke={isCenterHovered ? "url(#sacredNeonGradient)" : (isActive ? "url(#divineEnergy)" : "url(#dimmedEnergy)")}
-                    strokeWidth={isCenterHovered ? 2.5 : (isActive ? 2 : 1.2)}
-                    strokeOpacity={isCenterHovered ? 1 : (isActive ? 0.6 : 0.5)}
+                    stroke={isCenterHovered ? 'url(#sacredNeonGradient)' : (isActive ? 'url(#divineEnergy)' : 'url(#dimmedEnergy)')}
+                    strokeWidth={isCenterHovered ? 2 : (isActive ? 1.8 : 1)}
+                    strokeOpacity={isCenterHovered ? 0.7 : (isActive ? 0.55 : 0.45)}
                     strokeLinecap="round"
-                    className="transition-all duration-1000 ease-out"
-                    style={isCenterHovered ? {
-                      animation: `sacredNeonSpread ${1.5 + (index * 0.1)}s ease-out forwards`,
-                      animationDelay: `${index * 0.05}s`
-                    } : {}}
+                    style={{ transition: 'stroke 300ms ease-out, stroke-width 300ms ease-out, stroke-opacity 300ms ease-out' }}
                     aria-hidden="true"
                   />
-                  {/* Sacred red-yellow gradient traveling light effect */}
+                  {/* Single-pass particle on center hover – runs once then stops */}
                   {isCenterHovered && (
                     <path
                       d={path}
                       fill="none"
                       stroke="url(#sacredNeonGradient)"
-                      strokeWidth={3}
+                      strokeWidth={2}
                       strokeOpacity={0.9}
                       strokeLinecap="round"
-                      strokeDasharray={`${pathLength} ${pathLength}`}
-                      className="transition-all duration-1000 ease-out"
+                      pathLength={1}
+                      strokeDasharray="0.06 0.94"
                       style={{
-                        animation: `sacredNeonTravel ${1.5 + (index * 0.1)}s ease-out forwards`,
-                        animationDelay: `${index * 0.05}s`,
-                        filter: "url(#sacredNeonGlow)"
+                        animation: `particleTravel 1.2s ease-out ${index * 0.06}s forwards`,
+                        filter: 'url(#sacredNeonGlow)',
                       }}
                       aria-hidden="true"
                     />
                   )}
-                  {/* Inner highlight for active */}
                   {isActive && !isCenterHovered && (
-                    <path
-                      d={path}
-                      fill="none"
-                      stroke="#94a3b8"
-                      strokeWidth={0.5}
-                      strokeOpacity={0.3}
-                      strokeLinecap="round"
-                      className="transition-all duration-1000 ease-out"
-                      aria-hidden="true"
-                    />
+                    <path d={path} fill="none" stroke="#94a3b8" strokeWidth={0.5} strokeOpacity={0.25} strokeLinecap="round" aria-hidden="true" />
                   )}
                 </g>
               );
             })}
           </svg>
 
-          {/* Shivashray - The Illuminated Center (Desktop) */}
+          {/* Halo layer (Layer 1) – always present, 5–8% opacity */}
           <div
-            className={`
-              relative z-30
-              w-64 h-64 lg:w-80 lg:h-80
-              transition-all duration-1500 ease-out
-              ${mounted ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}
-            `}
+            className="absolute z-10 w-96 h-96 lg:w-[28rem] lg:h-[28rem] rounded-full pointer-events-none"
+            style={{
+              background: 'radial-gradient(circle, rgba(148,163,184,0.06) 0%, rgba(148,163,184,0.02) 50%, transparent 70%)',
+              filter: 'blur(24px)',
+            }}
+          />
+          <div
+            className="absolute z-10 w-96 h-96 lg:w-[28rem] lg:h-[28rem] rounded-full pointer-events-none dark:opacity-80"
+            style={{
+              background: 'radial-gradient(circle, rgba(251,191,36,0.04) 0%, transparent 60%)',
+              filter: 'blur(32px)',
+              animation: 'centerPulse 7s ease-in-out infinite',
+            }}
+          />
+
+          {/* Center node (Layer 3) – 300ms hover transition, glow expands */}
+          <div
+            className={`relative z-30 w-64 h-64 lg:w-80 lg:h-80 transition-all duration-300 ease-out ${
+              mounted ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+            }`}
             onMouseEnter={() => setHoveredCenter(true)}
             onMouseLeave={() => setHoveredCenter(false)}
           >
             <div
               className={`
-                absolute inset-0
-                rounded-full
-                overflow-hidden
-                bg-white/95 dark:bg-slate-800/80
-                backdrop-blur-sm
-                border border-slate-200/60 dark:border-slate-700/40
-                flex items-center justify-center
-                transition-all duration-1000 ease-out
-                cursor-pointer
-                ${hoveredCenter ? 'shadow-[0_0_40px_rgba(239,68,68,0.5),0_0_80px_rgba(251,191,36,0.4),0_4px_20px_rgba(0,0,0,0.06)] dark:shadow-[0_0_40px_rgba(239,68,68,0.6),0_0_80px_rgba(251,191,36,0.5),0_4px_20px_rgba(0,0,0,0.2)] scale-105' : 'shadow-[0_4px_20px_rgba(0,0,0,0.06),0_0_0_1px_rgba(0,0,0,0.02)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2),0_0_0_1px_rgba(255,255,255,0.05)]'}
+                absolute inset-0 rounded-full overflow-hidden bg-white/95 dark:bg-slate-800/80 backdrop-blur-sm
+                flex items-center justify-center cursor-pointer
+                transition-all duration-300 ease-out
+                ${hoveredCenter ? 'shadow-[0_0_32px_rgba(198,167,94,0.25),0_0_64px_rgba(198,167,94,0.15),0_4px_20px_rgba(0,0,0,0.06)] dark:shadow-[0_0_32px_rgba(198,167,94,0.3),0_0_64px_rgba(198,167,94,0.2),0_4px_20px_rgba(0,0,0,0.2)] scale-[1.03]' : 'shadow-[0_4px_20px_rgba(0,0,0,0.06),inset_0_1px_0_rgba(255,255,255,0.5)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.06)]'}
               `}
               role="img"
               aria-label="Shivashray, the center of the constellation"
@@ -418,12 +285,10 @@ export function ConstellationExploration({ places }: ConstellationExplorationPro
                   style={{
                     left: `calc(50% + ${pos.x}px)`,
                     top: `calc(50% + ${pos.y}px)`,
-                    transform: 'translate(-50%, -50%)',
-                    transition: mounted 
-                      ? `all 1s cubic-bezier(0.4, 0, 0.2, 1) ${index * 0.15}s`
-                      : 'none',
-                    opacity: mounted ? (isActive || hoveredCenter ? 1 : 0.6) : 0,
-                    scale: mounted ? (isActive || hoveredCenter ? 1.15 : 1) : 0.9,
+                    transform: `translate(-50%, -50%) scale(${mounted ? (isActive || hoveredCenter ? 1.08 : 1) : 0.95})`,
+                    transition: mounted ? 'opacity 300ms ease-out, transform 300ms ease-out' : 'none',
+                    transitionDelay: mounted ? `${index * 0.05}s` : '0ms',
+                    opacity: mounted ? (isActive || hoveredCenter ? 1 : 0.65) : 0,
                   }}
                 >
                   <Link
@@ -436,40 +301,18 @@ export function ConstellationExploration({ places }: ConstellationExplorationPro
                     aria-label={`Explore ${place.name}`}
                     tabIndex={0}
                   >
-                    {/* Floating Node */}
                     <div
                       className={`
-                        relative
-                        px-6 py-3 md:px-8 md:py-4
-                        rounded-full
-                        bg-white/90 dark:bg-slate-800/60
-                        backdrop-blur-md
-                        border border-slate-200/60 dark:border-slate-700/40
-                        transition-all duration-700 ease-out
-                        group
-                        ${isActive 
-                          ? 'border-slate-300 dark:border-slate-600 shadow-[0_8px_30px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)] scale-105' 
-                          : 'hover:border-slate-300/80 dark:hover:border-slate-600/60 hover:shadow-[0_4px_20px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_4px_20px_rgba(0,0,0,0.2)]'
-                        }
-                        ${hoveredCenter 
-                          ? 'border-orange-400/60 dark:border-orange-500/60 shadow-[0_0_20px_rgba(239,68,68,0.4),0_0_40px_rgba(251,191,36,0.3),0_8px_30px_rgba(0,0,0,0.12)] dark:shadow-[0_0_20px_rgba(239,68,68,0.5),0_0_40px_rgba(251,191,36,0.4),0_8px_30px_rgba(0,0,0,0.3)] scale-105' 
-                          : 'shadow-[0_2px_12px_rgba(0,0,0,0.04)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.15)]'
-                        }
+                        relative px-6 py-3 md:px-8 md:py-4 rounded-full backdrop-blur-md
+                        bg-gradient-to-b from-white/95 to-white/85 dark:from-slate-800/80 dark:to-slate-800/60
+                        transition-all duration-300 ease-out
+                        shadow-[0_2px_16px_rgba(0,0,0,0.05)] dark:shadow-[0_2px_16px_rgba(0,0,0,0.2)]
+                        [box-shadow:0_2px_16px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.6)] dark:[box-shadow:0_2px_16px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.08)]
+                        ${isActive ? 'shadow-[0_8px_28px_rgba(0,0,0,0.1)] dark:shadow-[0_8px_28px_rgba(0,0,0,0.35)] scale-105' : ''}
+                        ${hoveredCenter ? 'shadow-[0_0_20px_rgba(198,167,94,0.2),0_8px_28px_rgba(0,0,0,0.1)] dark:shadow-[0_0_20px_rgba(198,167,94,0.25),0_8px_28px_rgba(0,0,0,0.3)] scale-105' : ''}
                       `}
-                      style={hoveredCenter ? {
-                        animation: `sacredNodeGlow ${1.5 + (index * 0.1)}s ease-out forwards`,
-                        animationDelay: `${index * 0.05}s`
-                      } : {}}
                     >
-                      {/* Place name */}
-                      <h3 className={`
-                        relative z-10
-                        text-base md:text-lg lg:text-xl
-                        font-light text-slate-900 dark:text-slate-100
-                        leading-tight tracking-tight
-                        transition-all duration-500 ease-out
-                        ${isActive ? 'text-slate-950 dark:text-slate-50' : ''}
-                      `}>
+                      <h3 className={`relative z-10 text-base md:text-lg lg:text-xl font-light text-slate-900 dark:text-slate-100 leading-tight tracking-tight transition-colors duration-200 ${isActive ? 'text-slate-950 dark:text-slate-50' : ''}`}>
                         {place.name}
                       </h3>
                     </div>
