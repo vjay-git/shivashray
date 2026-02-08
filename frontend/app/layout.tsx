@@ -27,6 +27,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Shiv Ashray - Premier Lodging in the Heart of Varanasi",
   description: "A seamless blend of tradition and spiritual serenity in the spiritual capital of India. Located near Kashi Vishwanath Temple, offering personalized services for a memorable stay. 25 rooms across 3 floors with modern amenities.",
+  icons: {
+    icon: "/shivashray.png",
+    apple: "/shivashray.png",
+  },
 };
 
 export default function RootLayout({
