@@ -17,7 +17,6 @@ export function Footer() {
       { href: '/contact', label: 'Contact' },
     ],
     support: [
-      { href: '/bookings', label: 'My Bookings' },
       { href: '/faq', label: 'FAQ' },
       { href: '/help', label: 'Help Center' },
     ],

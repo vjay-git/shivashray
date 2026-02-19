@@ -48,6 +48,15 @@ NEXT_PUBLIC_USE_MOCK_API=false
 NEXT_PUBLIC_API_URL=https://your-api-domain.com/api/v1
 ```
 
+For **WhatsApp Floater**:
+```bash
+# Digits only (with country code), no leading '+'
+NEXT_PUBLIC_WHATSAPP_NUMBER=919369353505
+
+# Optional prefilled message
+NEXT_PUBLIC_WHATSAPP_MESSAGE=Namaste!%20I%20want%20to%20enquire%20about%20room%20availability.
+```
+
 ### What Mock Mode Provides
 
 The mock API provides sample data for:

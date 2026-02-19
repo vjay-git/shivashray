@@ -3,12 +3,14 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { hotelContent } from '@/lib/content/hotel-content';
+import { getBookingEngineUrl } from '@/lib/booking-engine';
 
 const GOLD = '#D4AF37';
 const GOLD_BRIGHT = '#E8C547'; /* brighter gold for gradient visibility */
 const GOLD_MUTED = 'rgba(212, 175, 55, 0.4)';
 
 export function Hero() {
+  const bookingEngineUrl = getBookingEngineUrl();
   const tagline = hotelContent.tagline ?? '';
   const nameParts = hotelContent.name.split(/\s+/);
   const hasTwoParts = nameParts.length > 1;
@@ -94,68 +96,31 @@ export function Hero() {
             24hr hot water, AC & smart doors.
           </p>
           {/* Primary CTA – gold accent */}
-          <Link
-            href="/rooms"
+          <a
+            href={bookingEngineUrl}
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center justify-center px-8 py-4 min-h-[52px] bg-[#C6A75E] text-[#0E1A2B] text-base font-semibold rounded-[12px] transition-all duration-300 hover:bg-[#D4AF37] hover:shadow-[0_12px_40px_rgba(198,167,94,0.35)] active:scale-[0.98]"
           >
-            Book Your Stay
-          </Link>
+            Check Availability
+          </a>
         </div>
 
-        {/* Glassmorphic search module – elegant, spacious */}
-        <div
-          className="mt-12 md:mt-16 max-w-4xl rounded-[14px] p-5 sm:p-6 md:p-7 border border-white/15"
-          style={{
-            background: 'rgba(248, 246, 242, 0.12)',
-            backdropFilter: 'blur(20px)',
-            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.25)',
-          }}
-        >
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
-            <div>
-              <label className="block text-[13px] font-medium text-white/80 mb-2 uppercase tracking-wider">
-                Check-in
-              </label>
-              <input
-                type="date"
-                className="w-full h-12 px-4 rounded-[10px] bg-white/10 border border-white/20 text-white placeholder-white/50 text-[15px] focus:outline-none focus:border-[#C6A75E]/60 focus:ring-1 focus:ring-[#C6A75E]/40 transition-colors"
-                placeholder="Select date"
-              />
-            </div>
-            <div>
-              <label className="block text-[13px] font-medium text-white/80 mb-2 uppercase tracking-wider">
-                Check-out
-              </label>
-              <input
-                type="date"
-                className="w-full h-12 px-4 rounded-[10px] bg-white/10 border border-white/20 text-white placeholder-white/50 text-[15px] focus:outline-none focus:border-[#C6A75E]/60 focus:ring-1 focus:ring-[#C6A75E]/40 transition-colors"
-                placeholder="Select date"
-              />
-            </div>
-            <div>
-              <label className="block text-[13px] font-medium text-white/80 mb-2 uppercase tracking-wider">
-                Guests
-              </label>
-              <select
-                className="w-full h-12 px-4 rounded-[10px] bg-white/10 border border-white/20 text-white text-[15px] focus:outline-none focus:border-[#C6A75E]/60 focus:ring-1 focus:ring-[#C6A75E]/40 transition-colors [&>option]:bg-[#0E1A2B]"
-                defaultValue=""
-              >
-                <option value="">Guests</option>
-                <option value="1">1 Guest</option>
-                <option value="2">2 Guests</option>
-                <option value="3">3 Guests</option>
-                <option value="4">4+ Guests</option>
-              </select>
-            </div>
-            <div className="flex items-end">
-              <Link
-                href="/rooms"
-                className="w-full h-12 flex items-center justify-center rounded-[10px] bg-[#C6A75E] text-[#0E1A2B] text-[15px] font-semibold transition-all duration-300 hover:bg-[#D4AF37] hover:shadow-[0_8px_24px_rgba(198,167,94,0.3)]"
-              >
-                Search
-              </Link>
-            </div>
-          </div>
+        {/* Booking handoff – keep hero clean, avoid redundant in-site availability UI */}
+        <div className="mt-10 md:mt-12">
+          <a
+            href={bookingEngineUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-sm font-medium text-white/80 hover:text-white transition-colors"
+          >
+            <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/10 border border-white/15">
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h6m0 0v6m0-6L10 20l-3-3 10-10z" />
+              </svg>
+            </span>
+            Book securely on Stayflexi
+          </a>
         </div>
       </div>
     </section>

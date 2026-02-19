@@ -6,10 +6,9 @@ import api from '@/lib/api';
 import { Room } from '@/types';
 import Image from 'next/image';
 import Link from 'next/link';
-import { BookingForm } from '@/components/booking/BookingForm';
-import { useAuthStore } from '@/lib/store';
 import { getRoomTypeImage, getAllRoomImages, getRoomTypeImages } from '@/lib/utils/room-images';
 import { PremiumBackground } from '@/components/layout/PremiumBackground';
+import { getBookingEngineUrl } from '@/lib/booking-engine';
 
 const GOLD = '#D4AF37';
 
@@ -27,13 +26,13 @@ export default function RoomDetailPage() {
   const params = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
   const [room, setRoom] = useState<Room | null>(null);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [checkIn, setCheckIn] = useState(searchParams.get('check_in') || '');
   const [checkOut, setCheckOut] = useState(searchParams.get('check_out') || '');
+  const bookingEngineUrl = getBookingEngineUrl();
 
   useEffect(() => {
     setMounted(true);
@@ -282,26 +281,25 @@ export default function RoomDetailPage() {
                     <span className="text-[16px] font-normal text-slate-500 dark:text-slate-400">/night</span>
                   </p>
                 </div>
-                {isAuthenticated ? (
-                  <BookingForm
-                    room={room}
-                    initialCheckIn={checkIn}
-                    initialCheckOut={checkOut}
-                  />
-                ) : (
-                  <div className="space-y-6">
-                    <p className="text-[16px] text-slate-600 dark:text-slate-400 font-light leading-relaxed">
-                      Sign in to check availability and book this room.
-                    </p>
-                    <Link
-                      href="/login"
-                      className="block w-full py-4 rounded-2xl font-semibold text-[16px] text-center transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
-                      style={{ background: GOLD, color: '#0F1115' }}
-                    >
-                      Sign in to Book
-                    </Link>
-                  </div>
-                )}
+                <div className="space-y-5">
+                  <p className="text-[15px] text-slate-600 dark:text-slate-400 font-light leading-relaxed">
+                    Live availability and secure booking are handled via our booking engine.
+                  </p>
+
+                  <a
+                    href={bookingEngineUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full py-4 rounded-2xl font-semibold text-[16px] text-center transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                    style={{ background: GOLD, color: '#0F1115' }}
+                  >
+                    Check Availability on Stayflexi
+                  </a>
+
+                  <p className="text-[13px] text-slate-500 dark:text-slate-400 font-light">
+                    Prefer booking with us directly? Use the WhatsApp button below-right.
+                  </p>
+                </div>
               </div>
             </div>
           </div>

@@ -2,35 +2,17 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useAuthStore, useSidebarStore } from '@/lib/store';
+import { useSidebarStore } from '@/lib/store';
 import { useEffect, useState } from 'react';
-import api from '@/lib/api';
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { hotelContent } from '@/lib/content/hotel-content';
+import { getBookingEngineUrl } from '@/lib/booking-engine';
 
 export function Navbar() {
-  const { user, isAuthenticated, setUser, logout } = useAuthStore();
-  const router = useRouter();
   const pathname = usePathname();
+  const bookingEngineUrl = getBookingEngineUrl();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-
-  useEffect(() => {
-    // Fetch current user on mount
-    const fetchUser = async () => {
-      const token = localStorage.getItem('access_token');
-      if (token) {
-        try {
-          const response = await api.get('/auth/me');
-          setUser(response.data);
-        } catch (error) {
-          logout();
-        }
-      }
-    };
-    fetchUser();
-  }, [setUser, logout]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -39,12 +21,6 @@ export function Navbar() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  const handleLogout = () => {
-    logout();
-    router.push('/');
-    setIsUserMenuOpen(false);
-  };
 
   const GOLD = '#D4AF37';
   const primaryNav = [
@@ -104,13 +80,15 @@ export function Navbar() {
 
             {/* Right: Book (gold outline) + Menu */}
             <div className="flex flex-1 justify-end items-center gap-1 flex-shrink-0">
-              <Link
-                href="/rooms"
+              <a
+                href={bookingEngineUrl}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="hidden sm:inline-flex items-center justify-center px-4 py-2 rounded-full text-[13px] font-medium text-slate-800 dark:text-slate-200 border border-[#D4AF37]/60 hover:bg-[#D4AF37]/10 hover:border-[#D4AF37] transition-all duration-200"
                 style={{ color: 'inherit' }}
               >
                 Book
-              </Link>
+              </a>
               <button
                 type="button"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -208,69 +186,16 @@ export function Navbar() {
                 </Link>
               );
             })}
-            {isAuthenticated && (
-              <>
-                <Link
-                  href="/bookings"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={`block py-3 px-4 text-[20px] font-light border-b transition-all duration-300 ${
-                    pathname.startsWith('/bookings')
-                      ? 'border-[#D4AF37] text-slate-900 dark:text-slate-100'
-                      : 'border-transparent text-slate-800 dark:text-slate-200 hover:text-slate-900 dark:hover:text-slate-100'
-                  }`}
-                  style={{ fontFamily: 'var(--font-playfair-display), Georgia, serif' }}
-                >
-                  My Bookings
-                </Link>
-                {user?.role === 'admin' && (
-                  <Link
-                    href="/admin"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="block py-3 px-4 text-[20px] font-light text-slate-800 dark:text-slate-200 hover:text-slate-900 dark:hover:text-slate-100 border-b border-transparent transition-all duration-300"
-                    style={{ fontFamily: 'var(--font-playfair-display), Georgia, serif' }}
-                  >
-                    Admin
-                  </Link>
-                )}
-              </>
-            )}
-            <Link
-              href="/rooms"
+            <a
+              href={bookingEngineUrl}
+              target="_blank"
+              rel="noopener noreferrer"
               onClick={() => setIsMobileMenuOpen(false)}
               className="mt-4 py-3 px-6 rounded-full text-[16px] font-medium transition-all duration-200 hover:opacity-90"
               style={{ background: GOLD, color: '#0F1115' }}
             >
               Book Now
-            </Link>
-            {isAuthenticated ? (
-              <div className="mt-8 pt-6 border-t border-slate-200/50 dark:border-slate-700/40 flex flex-col items-center gap-2">
-                <p className="text-[14px] font-medium text-slate-700 dark:text-slate-300">{user?.full_name}</p>
-                <button
-                  type="button"
-                  onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}
-                  className="text-[14px] font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
-                >
-                  Logout
-                </button>
-              </div>
-            ) : (
-              <div className="mt-6 flex gap-4">
-                <Link
-                  href="/login"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-[15px] font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
-                >
-                  Login
-                </Link>
-                <Link
-                  href="/register"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-[15px] font-medium py-2 px-4 rounded-full border border-slate-300 dark:border-slate-600 text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                >
-                  Sign Up
-                </Link>
-              </div>
-            )}
+            </a>
           </div>
         </nav>
       </div>
@@ -370,40 +295,7 @@ export function Navbar() {
               );
             })}
 
-            {isAuthenticated && (
-              <>
-                <div className="h-px w-full my-3 bg-gradient-to-r from-transparent via-slate-200/60 to-transparent dark:via-slate-700/50" />
-                <Link
-                  href="/bookings"
-                  className={`group flex items-center gap-3 rounded-[16px] py-3 px-4 transition-all duration-200 ${isSidebarCollapsed ? 'justify-center px-0' : ''} ${
-                    pathname.startsWith('/bookings') ? 'bg-slate-200/50 dark:bg-slate-800/50 text-slate-900 dark:text-slate-100 backdrop-blur-sm' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100/60 dark:hover:bg-slate-800/40 hover:text-slate-800 dark:hover:text-slate-200 hover:-translate-y-0.5'
-                  }`}
-                  style={{
-                    transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)',
-                    borderLeft: pathname.startsWith('/bookings') ? `3px solid ${GOLD}` : '3px solid transparent',
-                  }}
-                >
-                  <span className="w-5 h-5 flex-shrink-0 flex items-center justify-center">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
-                  </span>
-                  {!isSidebarCollapsed && <span className="text-[15px] font-medium tracking-[0.02em] whitespace-nowrap">Bookings</span>}
-                </Link>
-                {user?.role === 'admin' && (
-                  <Link
-                    href="/admin"
-                    className={`group flex items-center gap-3 rounded-[16px] py-3 px-4 transition-all duration-200 ${isSidebarCollapsed ? 'justify-center px-0' : ''} ${
-                      pathname.startsWith('/admin') ? 'bg-slate-200/50 dark:bg-slate-800/50 text-slate-900 dark:text-slate-100' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100/60 dark:hover:bg-slate-800/40 hover:-translate-y-0.5'
-                    }`}
-                    style={{ borderLeft: pathname.startsWith('/admin') ? `3px solid ${GOLD}` : '3px solid transparent' }}
-                  >
-                    <span className="w-5 h-5 flex-shrink-0 flex items-center justify-center">
-                      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                    </span>
-                    {!isSidebarCollapsed && <span className="text-[15px] font-medium tracking-[0.02em] whitespace-nowrap">Admin</span>}
-                  </Link>
-                )}
-              </>
-            )}
+            {/* Admin area intentionally omitted from the public site */}
           </nav>
 
           {/* C. Secondary – More: Settings, Support */}
@@ -431,51 +323,7 @@ export function Navbar() {
 
           {/* D. Bottom Profile Area + Collapse */}
           <div className="flex-shrink-0 pt-4 border-t border-slate-200/50 dark:border-slate-700/40">
-            {isAuthenticated ? (
-              <>
-                <div className={`flex items-center gap-3 rounded-[16px] px-4 py-3 bg-slate-100/40 dark:bg-slate-800/30 backdrop-blur-sm ${isSidebarCollapsed ? 'justify-center' : ''} transition-all duration-200 hover:bg-slate-100/60 dark:hover:bg-slate-800/50`}>
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-slate-800 dark:text-slate-100 text-[15px] font-medium flex-shrink-0 ring-1 ring-slate-200/60 dark:ring-slate-600/40" style={{ background: `linear-gradient(135deg, ${GOLD}22, ${GOLD}11)` }}>
-                    {user?.full_name?.charAt(0).toUpperCase() || 'U'}
-                  </div>
-                  {!isSidebarCollapsed && (
-                    <div className="min-w-0 flex-1">
-                      <p className="text-slate-900 dark:text-slate-100 text-[14px] font-medium truncate">{user?.full_name}</p>
-                      <span className="inline-block mt-0.5 text-[11px] font-medium tracking-wide" style={{ color: GOLD }}>Member</span>
-                    </div>
-                  )}
-                </div>
-                <div className={`mt-2 space-y-0.5 ${isSidebarCollapsed ? 'flex flex-col items-center' : ''}`}>
-                  <button
-                    onClick={handleLogout}
-                    className={`w-full flex items-center gap-3 rounded-[14px] py-2.5 text-[14px] text-slate-500 dark:text-slate-400 hover:bg-slate-100/60 dark:hover:bg-slate-800/40 hover:text-slate-700 dark:hover:text-slate-300 transition-all duration-200 ${isSidebarCollapsed ? 'justify-center px-0' : 'px-4'}`}
-                  >
-                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-                    {!isSidebarCollapsed && <span>Logout</span>}
-                  </button>
-                </div>
-              </>
-            ) : (
-              <div className={`space-y-1.5 ${isSidebarCollapsed ? 'flex flex-col items-center' : ''}`}>
-                <Link
-                  href="/login"
-                  className={`flex items-center gap-3 rounded-[16px] py-3 px-4 transition-all duration-200 ${isSidebarCollapsed ? 'justify-center px-0' : ''} ${
-                    pathname === '/login' ? 'bg-slate-200/50 dark:bg-slate-800/50 text-slate-900 dark:text-slate-100' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100/60 dark:hover:bg-slate-800/40 hover:text-slate-800 dark:hover:text-slate-200 hover:-translate-y-0.5'
-                  }`}
-                  style={{ borderLeft: pathname === '/login' ? `3px solid ${GOLD}` : '3px solid transparent' }}
-                >
-                  <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
-                  {!isSidebarCollapsed && <span className="text-[15px] font-medium">Login</span>}
-                </Link>
-                <Link
-                  href="/register"
-                  className={`flex items-center gap-3 rounded-[16px] py-3 px-4 font-medium text-[15px] transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] ${isSidebarCollapsed ? 'justify-center px-0' : ''}`}
-                  style={{ background: GOLD, color: '#0F1115' }}
-                >
-                  <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
-                  {!isSidebarCollapsed && <span>Sign Up</span>}
-                </Link>
-              </div>
-            )}
+            {/* No login/signup in the public site */}
 
             <button
               onClick={toggleSidebar}

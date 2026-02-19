@@ -4,6 +4,7 @@ import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { MainContent } from "@/components/layout/MainContent";
+import { WhatsAppFloater } from "@/components/layout/WhatsAppFloater";
 
 /* Luxury typography: two families only – serif (headings), sans (body & UI) */
 const cormorantGaramond = Cormorant_Garamond({
@@ -46,6 +47,7 @@ export default function RootLayout({
         <Navbar />
         <MainContent>{children}</MainContent>
         <Footer />
+        <WhatsAppFloater />
       </body>
     </html>
   );
