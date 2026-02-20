@@ -4,3 +4,4 @@ export { RadialExploration } from './RadialExploration';
 export { ArtisticGrid } from './ArtisticGrid';
 export { CenteredExploration } from './CenteredExploration';
 export { ConstellationExploration } from './ConstellationExploration';
+export { MapExploration } from './MapExploration';

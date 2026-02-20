@@ -85,6 +85,8 @@ export interface Place {
   distance?: string;
   travelHint?: string;
   imageUrl?: string;
+  mapAngle?: number;       // degrees from North (0=N, 90=E, 180=S, 270=W)
+  mapDistanceKm?: number;  // actual distance in km for map positioning
   content: {
     introduction: string;
     context?: string;
