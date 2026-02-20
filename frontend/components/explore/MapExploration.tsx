@@ -180,11 +180,16 @@ export function MapExploration({ places }: MapExplorationProps) {
               {g.items.map(place => {
                 const c   = CAT[place.category as keyof typeof CAT] ?? CAT['sacred-temples'];
                 const col = isDark ? c.dark : c.color;
+                const km = place.mapDistanceKm ?? 0;
+                const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(place.name + ', Varanasi, India')}&travelmode=${km < 2 ? 'walking' : km < 10 ? 'transit' : 'driving'}`;
                 return (
-                  <button
+                  <div
                     key={place.id}
+                    role="button"
+                    tabIndex={0}
                     onClick={() => router.push(`/explore/${place.slug}`)}
-                    className="w-full flex items-stretch rounded-xl overflow-hidden text-left group active:scale-[0.982] transition-all duration-150"
+                    onKeyDown={e => e.key === 'Enter' && router.push(`/explore/${place.slug}`)}
+                    className="w-full flex items-stretch rounded-xl overflow-hidden text-left group active:scale-[0.982] transition-all duration-150 cursor-pointer"
                     style={{
                       background: isDark
                         ? 'linear-gradient(135deg,rgba(30,27,42,.9) 0%,rgba(22,20,34,.95) 100%)'
@@ -207,12 +212,22 @@ export function MapExploration({ places }: MapExplorationProps) {
                       <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap tabular-nums"
                           style={{ background: `${col}18`, color: col }}>{place.distance}</span>
-                        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" className="opacity-25 transition-opacity group-active:opacity-50">
-                          <path d="M3 1.5L7 5 3 8.5" stroke={col} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
+                        <a
+                          href={mapsUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={e => e.stopPropagation()}
+                          className="p-1 rounded-md opacity-35 hover:opacity-80 transition-opacity duration-150"
+                          style={{ color: col }}
+                          aria-label={`Navigate to ${place.name} in Google Maps`}
+                        >
+                          <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                            <path d="M2 9L9 2M9 2H4.5M9 2V6.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </a>
                       </div>
                     </div>
-                  </button>
+                  </div>
                 );
               })}
             </div>
@@ -600,6 +615,8 @@ export function MapExploration({ places }: MapExplorationProps) {
             const c   = CAT[hoveredPlace.category as keyof typeof CAT] ?? CAT['sacred-temples'];
             const col = isDark ? c.dark : c.color;
             const { leftPct, topPct, above, shiftLeft } = tooltipData;
+            const hkm = hoveredPlace.mapDistanceKm ?? 0;
+            const hMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(hoveredPlace.name + ', Varanasi, India')}&travelmode=${hkm < 2 ? 'walking' : hkm < 10 ? 'transit' : 'driving'}`;
             return (
               <div className="absolute z-30 pointer-events-none"
                 style={{
@@ -624,6 +641,18 @@ export function MapExploration({ places }: MapExplorationProps) {
                         {hoveredPlace.travelHint}
                       </p>
                     )}
+                    <a
+                      href={hMapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-2.5 flex items-center justify-between hover:opacity-75 transition-opacity duration-150"
+                      style={{ pointerEvents: 'auto', color: col }}
+                    >
+                      <span className="text-[10px] font-semibold">Open in Maps</span>
+                      <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
+                        <path d="M1.5 7.5L7.5 1.5M7.5 1.5H3.5M7.5 1.5V5.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </a>
                   </div>
                 </div>
                 {/* Arrow */}

@@ -176,6 +176,18 @@ export default function PlaceDetailPage() {
                 {place.distance} from hotel
               </span>
             )}
+            <a
+              href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(place.name + ', Varanasi, India')}&travelmode=${(place.mapDistanceKm ?? 0) < 2 ? 'walking' : (place.mapDistanceKm ?? 0) < 10 ? 'transit' : 'driving'}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold text-white/90 hover:text-white transition-colors duration-150"
+              style={{ background: 'rgba(66,133,244,0.28)', border: '1px solid rgba(66,133,244,0.45)', backdropFilter: 'blur(8px)' }}
+            >
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                <path d="M1.5 8.5L8.5 1.5M8.5 1.5H3.5M8.5 1.5V6.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              Navigate
+            </a>
           </div>
 
           {/* Place name */}
@@ -271,6 +283,18 @@ export default function PlaceDetailPage() {
                 <p className="text-base md:text-lg font-light text-slate-700 dark:text-slate-300 leading-relaxed">
                   {place.content.howToReach}
                 </p>
+                <a
+                  href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(place.name + ', Varanasi, India')}&travelmode=${(place.mapDistanceKm ?? 0) < 2 ? 'walking' : (place.mapDistanceKm ?? 0) < 10 ? 'transit' : 'driving'}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-4 inline-flex items-center gap-2 text-[12px] font-medium hover:opacity-80 transition-opacity duration-150"
+                  style={{ color: col }}
+                >
+                  Open in Google Maps
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                    <path d="M1.5 8.5L8.5 1.5M8.5 1.5H3.5M8.5 1.5V6.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </a>
               </div>
             </div>
           )}
