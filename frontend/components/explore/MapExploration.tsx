@@ -67,7 +67,7 @@ function shortMapName(name: string): string {
 function labelPos(
   px: number, py: number,
   angle: number, pinR: number,
-): { lx: number; ly: number; anchor: string } {
+): { lx: number; ly: number; anchor: 'start' | 'end' | 'middle' } {
   const a   = ((angle % 360) + 360) % 360;
   const rad = ((a - 90) * Math.PI) / 180;
   const nx  = Math.cos(rad);
@@ -77,7 +77,7 @@ function labelPos(
   const ly  = py + ny * PAD;
 
   // Use a tight threshold so labels spread left/right even for nearly-vertical angles
-  const anchor = nx > 0.08 ? 'start' : nx < -0.08 ? 'end' : 'middle';
+  const anchor: 'start' | 'end' | 'middle' = nx > 0.08 ? 'start' : nx < -0.08 ? 'end' : 'middle';
 
   // Shift baseline so text sits correctly against the pin
   const baselineY =
