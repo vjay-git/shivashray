@@ -82,24 +82,32 @@ export function Testimonials() {
               style={{ transitionDelay: `${index * 100}ms` }}
             >
               <div className="mb-6">
-                <svg className="w-8 h-8 text-[#C6A75E]/50 mb-4" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 9.983-10.609l.996 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 10-10.609l.996 2.151c-2.432.917-3.995 3.638-3.995 5.849h3.983v10h-9.983z" />
-                </svg>
+                {/* Star rating */}
+                <div className="flex gap-0.5 mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <svg key={i} width="15" height="15" viewBox="0 0 15 15" fill="#C6A75E">
+                      <path d="M7.5 1l1.69 3.427 3.78.549-2.735 2.666.645 3.763L7.5 9.625l-3.38 1.78.645-3.763L1.03 4.976l3.78-.549z" />
+                    </svg>
+                  ))}
+                </div>
                 <p
                   className="text-[17px] text-[#0E1A2B] font-normal leading-relaxed"
                   style={{ fontFamily: 'var(--font-playfair-display), Georgia, serif' }}
                 >
-                  {testimonial.text}
+                  &ldquo;{testimonial.text}&rdquo;
                 </p>
               </div>
-              <div className="pt-6 border-t border-[#C6A75E]/15 flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-[#2F5D62]/20 flex items-center justify-center text-[#0E1A2B] font-semibold text-[15px] shadow-[0_4px_12px_rgba(0,0,0,0.06)]">
-                  {testimonial.name.charAt(0)}
+              <div className="pt-6 border-t border-[#C6A75E]/15 flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-[#2F5D62]/20 flex items-center justify-center text-[#0E1A2B] font-semibold text-[14px]">
+                    {testimonial.name.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="text-[14px] font-semibold text-[#0E1A2B]">{testimonial.name}</p>
+                    <p className="text-[12px] text-[#2F5D62] font-normal mt-0.5">{testimonial.location}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-[15px] font-semibold text-[#0E1A2B]">{testimonial.name}</p>
-                  <p className="text-[13px] text-[#2F5D62] font-normal mt-0.5">{testimonial.location}</p>
-                </div>
+                <span className="text-[10px] text-[#2F5D62]/50 font-medium uppercase tracking-wider">Google</span>
               </div>
             </div>
           ))}

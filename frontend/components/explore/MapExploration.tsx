@@ -28,13 +28,15 @@ const GROUPS = [
 const SVG_W = 740, SVG_H = 660;
 const CX = 370, CY = 315; // hotel center
 
+const r4 = (n: number) => Math.round(n * 1e4) / 1e4;
+
 function pinRadius(km: number) {
   return Math.min(258, 48 + 52 * Math.log2(km * 3 + 1));
 }
 function toXY(angle: number, km: number) {
   const r = pinRadius(km);
   const rad = ((angle - 90) * Math.PI) / 180;
-  return { x: r * Math.cos(rad), y: r * Math.sin(rad) };
+  return { x: r4(r * Math.cos(rad)), y: r4(r * Math.sin(rad)) };
 }
 function pinSize(km: number) {
   if (km < 0.5)  return { outer: 8.5, inner: 3.5 };
@@ -73,8 +75,8 @@ function labelPos(
   const nx  = Math.cos(rad);
   const ny  = Math.sin(rad);
   const PAD = pinR + 7;
-  const lx  = px + nx * PAD;
-  const ly  = py + ny * PAD;
+  const lx  = r4(px + nx * PAD);
+  const ly  = r4(py + ny * PAD);
 
   // Use a tight threshold so labels spread left/right even for nearly-vertical angles
   const anchor: 'start' | 'end' | 'middle' = nx > 0.08 ? 'start' : nx < -0.08 ? 'end' : 'middle';
@@ -103,10 +105,18 @@ const ROADS = [
 ];
 
 export function MapExploration({ places }: MapExplorationProps) {
-  const [hovered, setHovered]   = useState<string | null>(null);
-  const [isDark,  setIsDark]    = useState(false);
-  const [mounted, setMounted]   = useState(false);
+  const [hovered, setHovered]       = useState<string | null>(null);
+  const [isDark,  setIsDark]        = useState(false);
+  const [mounted, setMounted]       = useState(false);
+  const [collapsed, setCollapsed]   = useState<Set<string>>(new Set(['near', 'auto', 'trip']));
   const router = useRouter();
+
+  const toggleGroup = (key: string) =>
+    setCollapsed(prev => {
+      const next = new Set(prev);
+      next.has(key) ? next.delete(key) : next.add(key);
+      return next;
+    });
 
   useEffect(() => {
     setMounted(true);
@@ -165,74 +175,104 @@ export function MapExploration({ places }: MapExplorationProps) {
     <div className="w-full max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
 
       {/* ══ MOBILE ═══════════════════════════════════════════════════════ */}
-      <div className="md:hidden pb-12 space-y-10">
-        {groups.map(g => (
-          <div key={g.key}>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-200 to-slate-200/60 dark:via-slate-700/50 dark:to-slate-700/20" />
-              <div className="text-center px-1">
-                <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400 dark:text-slate-500">{g.label}</p>
-                <p className="text-[9px] font-light text-slate-300 dark:text-slate-700 mt-0.5">{g.sub}</p>
+      <div className="md:hidden pb-12 space-y-2">
+        {groups.map(g => {
+          const isOpen = !collapsed.has(g.key);
+          return (
+            <div key={g.key}
+              className="rounded-2xl overflow-hidden"
+              style={{
+                background: isDark
+                  ? 'rgba(30,27,42,0.6)'
+                  : 'rgba(255,255,255,0.7)',
+                boxShadow: isDark
+                  ? '0 1px 8px rgba(0,0,0,.2),inset 0 0 0 1px rgba(255,255,255,.03)'
+                  : '0 1px 8px rgba(0,0,0,.04),inset 0 0 0 1px rgba(255,255,255,.9)',
+              }}
+            >
+              {/* ── Group header (tap to toggle) ── */}
+              <button
+                className="w-full flex items-center gap-3 px-4 py-3.5 text-left"
+                onClick={() => toggleGroup(g.key)}
+                aria-expanded={isOpen}
+              >
+                <div className="flex-1 flex items-baseline gap-2">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-slate-600 dark:text-slate-400">{g.label}</p>
+                  <p className="text-[10px] font-light text-slate-400 dark:text-slate-600">{g.sub}</p>
+                </div>
+                <span className="text-[10px] font-semibold tabular-nums text-slate-400 dark:text-slate-600 mr-1">
+                  {g.items.length}
+                </span>
+                <svg
+                  width="12" height="12" viewBox="0 0 12 12" fill="none"
+                  className="flex-shrink-0 text-slate-400 dark:text-slate-600 transition-transform duration-300"
+                  style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                >
+                  <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+
+              {/* ── Place items (collapsible) ── */}
+              <div
+                className="overflow-hidden transition-all duration-300 ease-in-out"
+                style={{ maxHeight: isOpen ? `${g.items.length * 80}px` : '0px' }}
+              >
+                <div className="space-y-px px-2 pb-2">
+                  {g.items.map(place => {
+                    const c   = CAT[place.category as keyof typeof CAT] ?? CAT['sacred-temples'];
+                    const col = isDark ? c.dark : c.color;
+                    const km = place.mapDistanceKm ?? 0;
+                    const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(place.name + ', Varanasi, India')}&travelmode=${km < 2 ? 'walking' : km < 10 ? 'transit' : 'driving'}`;
+                    return (
+                      <div
+                        key={place.id}
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => router.push(`/explore/${place.slug}`)}
+                        onKeyDown={e => e.key === 'Enter' && router.push(`/explore/${place.slug}`)}
+                        className="w-full flex items-stretch rounded-xl overflow-hidden text-left group active:scale-[0.982] transition-all duration-150 cursor-pointer"
+                        style={{
+                          background: isDark
+                            ? 'rgba(22,20,34,0.8)'
+                            : 'rgba(250,248,244,0.9)',
+                        }}
+                      >
+                        <div className="w-[3.5px] flex-shrink-0" style={{ background: `linear-gradient(to bottom,${col},${col}70)` }} />
+                        <div className="flex-1 flex items-center gap-3.5 px-4 py-3.5">
+                          <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 transition-transform duration-150 group-active:scale-95"
+                            style={{ background: `${col}18` }}>
+                            <span className="text-[15px] leading-none" style={{ color: col }}>{c.icon}</span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">{place.name}</p>
+                            <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 truncate">{place.travelHint ?? c.label}</p>
+                          </div>
+                          <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap tabular-nums"
+                              style={{ background: `${col}18`, color: col }}>{place.distance}</span>
+                            <a
+                              href={mapsUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={e => e.stopPropagation()}
+                              className="p-1 rounded-md opacity-35 hover:opacity-80 transition-opacity duration-150"
+                              style={{ color: col }}
+                              aria-label={`Navigate to ${place.name} in Google Maps`}
+                            >
+                              <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                                <path d="M2 9L9 2M9 2H4.5M9 2V6.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+                              </svg>
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-              <div className="h-px flex-1 bg-gradient-to-l from-transparent via-slate-200 to-slate-200/60 dark:via-slate-700/50 dark:to-slate-700/20" />
             </div>
-            <div className="space-y-2.5">
-              {g.items.map(place => {
-                const c   = CAT[place.category as keyof typeof CAT] ?? CAT['sacred-temples'];
-                const col = isDark ? c.dark : c.color;
-                const km = place.mapDistanceKm ?? 0;
-                const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(place.name + ', Varanasi, India')}&travelmode=${km < 2 ? 'walking' : km < 10 ? 'transit' : 'driving'}`;
-                return (
-                  <div
-                    key={place.id}
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => router.push(`/explore/${place.slug}`)}
-                    onKeyDown={e => e.key === 'Enter' && router.push(`/explore/${place.slug}`)}
-                    className="w-full flex items-stretch rounded-xl overflow-hidden text-left group active:scale-[0.982] transition-all duration-150 cursor-pointer"
-                    style={{
-                      background: isDark
-                        ? 'linear-gradient(135deg,rgba(30,27,42,.9) 0%,rgba(22,20,34,.95) 100%)'
-                        : 'linear-gradient(135deg,rgba(255,255,255,.98) 0%,rgba(250,248,244,.95) 100%)',
-                      boxShadow: isDark
-                        ? '0 2px 12px rgba(0,0,0,.28),inset 0 0 0 1px rgba(255,255,255,.04)'
-                        : '0 2px 12px rgba(0,0,0,.06),inset 0 0 0 1px rgba(255,255,255,.8)',
-                    }}
-                  >
-                    <div className="w-[3.5px] flex-shrink-0" style={{ background: `linear-gradient(to bottom,${col},${col}70)` }} />
-                    <div className="flex-1 flex items-center gap-3.5 px-4 py-3.5">
-                      <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 transition-transform duration-150 group-active:scale-95"
-                        style={{ background: `${col}18` }}>
-                        <span className="text-[15px] leading-none" style={{ color: col }}>{c.icon}</span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">{place.name}</p>
-                        <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 truncate">{place.travelHint ?? c.label}</p>
-                      </div>
-                      <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap tabular-nums"
-                          style={{ background: `${col}18`, color: col }}>{place.distance}</span>
-                        <a
-                          href={mapsUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={e => e.stopPropagation()}
-                          className="p-1 rounded-md opacity-35 hover:opacity-80 transition-opacity duration-150"
-                          style={{ color: col }}
-                          aria-label={`Navigate to ${place.name} in Google Maps`}
-                        >
-                          <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
-                            <path d="M2 9L9 2M9 2H4.5M9 2V6.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* ══ DESKTOP ══════════════════════════════════════════════════════ */}

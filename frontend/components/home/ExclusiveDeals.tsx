@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import { getBookingEngineUrl } from '@/lib/booking-engine';
 
 export function ExclusiveDeals() {
   const [mounted, setMounted] = useState(false);
+  const bookingEngineUrl = getBookingEngineUrl();
 
   useEffect(() => {
     setMounted(true);
@@ -32,23 +33,28 @@ export function ExclusiveDeals() {
           }`}
         >
           <p className="text-[13px] font-medium text-[#C6A75E] uppercase tracking-[0.2em] mb-4">
-            Exclusive Offer
+            Kashi Awaits
           </p>
           <h2
             className="text-[36px] sm:text-[44px] md:text-[52px] font-normal text-[#F8F6F2] leading-[1.15] tracking-tight mb-6"
             style={{ fontFamily: 'var(--font-playfair-display), Georgia, serif' }}
           >
-            Begin Your Journey
+            Steps from the Sacred Ghats
           </h2>
-          <p className="text-[17px] md:text-[18px] text-white/80 font-normal leading-relaxed max-w-2xl mx-auto mb-10">
-            We invite you to experience a place where tradition meets tranquility, where every moment is designed to honor your journey.
+          <p className="text-[17px] md:text-[18px] text-white/70 font-normal leading-relaxed max-w-xl mx-auto mb-10">
+            Ganga Ghat, Kashi Vishwanath & Kal Bhairav — all within a 2–5 minute walk. No vehicle needed, just pure presence.
           </p>
-          <Link
-            href="/rooms"
-            className="inline-flex items-center justify-center px-8 py-4 min-h-[52px] bg-[#C6A75E] text-[#0E1A2B] text-base font-semibold rounded-[12px] transition-all duration-300 hover:bg-[#D4AF37] hover:shadow-[0_12px_40px_rgba(198,167,94,0.35)] active:scale-[0.98]"
+          <a
+            href={bookingEngineUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 px-8 py-4 min-h-[52px] bg-[#C6A75E] text-[#0E1A2B] text-base font-semibold rounded-[12px] transition-all duration-300 hover:bg-[#D4AF37] hover:shadow-[0_12px_40px_rgba(198,167,94,0.35)] active:scale-[0.98]"
           >
-            Book Your Stay
-          </Link>
+            Reserve Your Room
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+              <path d="M2 11L11 2M11 2H5M11 2V8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </a>
         </div>
       </div>
     </section>

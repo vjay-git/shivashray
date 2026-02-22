@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import api from '@/lib/api';
 import { Room, RoomType } from '@/types';
 import Link from 'next/link';
@@ -9,31 +9,26 @@ import { hotelContent } from '@/lib/content/hotel-content';
 import { getRoomTypeImage } from '@/lib/utils/room-images';
 import { hardcodedRoomTypes } from '@/lib/data/room-types';
 import { PremiumBackground } from '@/components/layout/PremiumBackground';
+import { getBookingEngineUrl } from '@/lib/booking-engine';
 
 const GOLD = '#D4AF37';
+const SERIF = 'var(--font-playfair-display), Georgia, serif';
 
-function SacredAccent() {
-  return (
-    <div className="flex items-center justify-center gap-3 py-8 md:py-10" aria-hidden>
-      <div className="h-px w-16 bg-gradient-to-r from-transparent via-slate-300/60 to-slate-300/60 dark:via-slate-500/40 dark:to-slate-500/40" />
-      <div className="w-1.5 h-1.5 rounded-full bg-slate-400/50 dark:bg-slate-500/40" />
-      <div className="h-px w-16 bg-gradient-to-l from-transparent via-slate-300/60 to-slate-300/60 dark:via-slate-500/40 dark:to-slate-500/40" />
-    </div>
-  );
-}
+// Best cover image index per room type (chosen for composition & warmth)
+const COVER_IMG: Record<string, number> = {
+  'deluxe room':       4,   // 89ba8bcf — warm, well-lit interior
+  'super deluxe room': 3,   // 14667271 — different angle from hero
+  'family room':       2,   // WhatsApp 7455891f — spacious feel
+};
 
 export default function RoomsPage() {
-  const [rooms, setRooms] = useState<Room[]>([]);
-  const [roomTypes, setRoomTypes] = useState<RoomType[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [checkIn, setCheckIn] = useState('');
-  const [checkOut, setCheckOut] = useState('');
-  const [selectedType, setSelectedType] = useState<number | null>(null);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 100000]);
-  const [showFilters, setShowFilters] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const [visibleRooms, setVisibleRooms] = useState<Set<number>>(new Set());
-  const roomRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [rooms, setRooms]           = useState<Room[]>([]);
+  const [roomTypes, setRoomTypes]   = useState<RoomType[]>([]);
+  const [loading, setLoading]       = useState(true);
+  const [mounted, setMounted]       = useState(false);
+  const [activeIdx, setActiveIdx]   = useState(0);
+  const [imgVisible, setImgVisible] = useState(true);
+  const bookingEngineUrl = getBookingEngineUrl();
 
   useEffect(() => {
     setMounted(true);
@@ -41,55 +36,20 @@ export default function RoomsPage() {
     fetchRooms();
   }, []);
 
-  useEffect(() => {
-    fetchRooms();
-  }, [checkIn, checkOut, selectedType]);
-
-  useEffect(() => {
-    const observers = roomRefs.current.map((ref, index) => {
-      if (!ref) return null;
-      const ob = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((e) => {
-            if (e.isIntersecting) setVisibleRooms((prev) => new Set(prev).add(index));
-          });
-        },
-        { threshold: 0.1, rootMargin: '-40px' }
-      );
-      ob.observe(ref);
-      return ob;
-    });
-    return () => observers.forEach((o) => o?.disconnect());
-  }, [rooms]);
-
   const fetchRoomTypes = async () => {
     try {
-      const response = await api.get('/rooms/types');
-      const types = response.data?.length ? response.data : hardcodedRoomTypes;
-      setRoomTypes(types);
-      if (types.length > 0) {
-        const prices = types.map((rt: RoomType) => rt.base_price);
-        setPriceRange([Math.min(...prices), Math.max(...prices)]);
-      }
+      const res = await api.get('/rooms/types');
+      setRoomTypes(res.data?.length ? res.data : hardcodedRoomTypes);
     } catch {
       setRoomTypes(hardcodedRoomTypes);
-      const prices = hardcodedRoomTypes.map((rt) => rt.base_price);
-      setPriceRange([Math.min(...prices), Math.max(...prices)]);
     }
   };
 
   const fetchRooms = async () => {
     setLoading(true);
     try {
-      const params: Record<string, unknown> = {};
-      if (checkIn && checkOut) {
-        params.check_in = checkIn;
-        params.check_out = checkOut;
-        params.available = true;
-      }
-      if (selectedType) params.room_type_id = selectedType;
-      const response = await api.get('/rooms', { params });
-      setRooms(response.data);
+      const res = await api.get('/rooms');
+      setRooms(res.data);
     } catch {
       setRooms([]);
     } finally {
@@ -97,365 +57,498 @@ export default function RoomsPage() {
     }
   };
 
-  const [today, setToday] = useState('');
-  const [tomorrow, setTomorrow] = useState('');
-  useEffect(() => {
-    setToday(new Date().toISOString().split('T')[0]);
-    setTomorrow(new Date(Date.now() + 86400000).toISOString().split('T')[0]);
-  }, []);
+  const switchTo = (idx: number) => {
+    if (idx === activeIdx) return;
+    setImgVisible(false);
+    setTimeout(() => { setActiveIdx(idx); setImgVisible(true); }, 240);
+  };
+  const prev = () => switchTo((activeIdx - 1 + roomTypes.length) % roomTypes.length);
+  const next = () => switchTo((activeIdx + 1) % roomTypes.length);
 
-  const filteredRooms = rooms.filter((room) => {
-    const price = room.room_type.base_price;
-    return price >= priceRange[0] && price <= priceRange[1];
-  });
-
-  const heroImage =
-    roomTypes.length > 0
-      ? getRoomTypeImage(roomTypes[0].name, 0)
-      : '/shivashray_images/Property Images/713583d6-b231-4eb5-82a8-4bbdcc4791fc.avif';
+  const activeType = roomTypes[activeIdx];
+  // Use a rich Super Deluxe image for the cinematic hero
+  const heroImg = '/shivashray_images/Super Deluxe Room/66de74a8-c3ad-4a98-b49d-9e331e4eacfc.jpg';
 
   return (
     <PremiumBackground variant="rooms">
       <div className="relative z-0">
-        {/* Hero – cinematic room image, soft overlay, serif headline */}
-        <section className="relative h-[55vh] min-h-[320px] md:h-[65vh] overflow-hidden">
+
+        {/* ══ HERO ══════════════════════════════════════════════════════ */}
+        <section className="relative min-h-[540px] md:min-h-[600px] lg:min-h-[680px] overflow-hidden">
           <Image
-            src={heroImage}
+            src={heroImg}
             alt="Shivashray rooms"
-            fill
-            priority
-            quality={95}
-            className="object-cover transition-transform duration-700 ease-out hover:scale-[1.02]"
+            fill priority quality={95}
+            className="object-cover"
             sizes="100vw"
+          />
+          {/* Asymmetric overlay: darker on left for text, lighter on right */}
+          <div
+            className="absolute inset-0"
+            style={{ background: 'linear-gradient(110deg, rgba(0,0,0,0.80) 0%, rgba(0,0,0,0.48) 55%, rgba(0,0,0,0.18) 100%)' }}
           />
           <div
             className="absolute inset-0"
-            style={{
-              background: 'linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,0.6) 100%)',
-            }}
+            style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.50) 0%, transparent 40%)' }}
           />
-          <div className="absolute inset-0 flex flex-col justify-end pb-12 md:pb-16 lg:pb-20 px-6 md:px-10 lg:px-12">
-            <div
-              className={`max-w-4xl transition-all duration-600 ease-out ${
-                mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
-              }`}
-            >
-              <h1
-                className="text-4xl md:text-5xl lg:text-6xl font-light text-white tracking-tight mb-3"
-                style={{ fontFamily: 'var(--font-playfair-display), Georgia, serif' }}
+
+          {/* Single flex-column container: clears navbar top, text in middle, stats pinned bottom */}
+          <div className="absolute inset-0 flex flex-col">
+
+            {/* Text block — grows to fill space, vertically centered in remaining area */}
+            <div className="flex-1 flex items-center pt-20 md:pt-24 pb-6">
+              <div
+                className={`px-6 md:px-10 lg:px-16 w-full max-w-xl transition-all duration-700 ease-out ${
+                  mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+                }`}
               >
-                Our Rooms
-              </h1>
-              <p className="text-lg md:text-xl text-white/90 font-light max-w-xl mb-8">
-                Thoughtfully designed spaces for comfort and tranquility — your sanctuary in the heart of Varanasi.
-              </p>
-              <div className="flex flex-wrap gap-4">
-                <a
-                  href="#availability"
-                  className="inline-flex items-center justify-center px-8 py-4 min-h-[52px] rounded-2xl font-medium text-[15px] transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
-                  style={{ background: GOLD, color: '#0F1115' }}
+                {/* Eyebrow */}
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="h-px w-8 flex-shrink-0" style={{ background: GOLD }} />
+                  <span className="text-[11px] uppercase tracking-[0.2em] font-medium whitespace-nowrap" style={{ color: GOLD }}>
+                    Shiv Ashray · Kashi
+                  </span>
+                </div>
+
+                {/* Heading — single line to save vertical space on mobile */}
+                <h1
+                  className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light text-white leading-[1.06] tracking-[-0.025em] mb-4 md:mb-5"
+                  style={{ fontFamily: SERIF }}
                 >
-                  Check Availability
-                </a>
-                <Link
-                  href="#amenities"
-                  className="inline-flex items-center justify-center px-8 py-4 min-h-[52px] rounded-2xl font-medium text-[15px] text-white border border-white/40 hover:bg-white/10 transition-all duration-200"
-                >
-                  View Amenities
-                </Link>
+                  Our Rooms
+                </h1>
+
+                {/* Subtitle */}
+                <p className="text-[15px] md:text-[16px] text-white/65 font-light leading-relaxed mb-7 md:mb-8 max-w-[320px] md:max-w-sm">
+                  Thoughtfully crafted sanctuaries in the ancient lanes of Varanasi.
+                </p>
+
+                {/* CTAs */}
+                <div className="flex flex-wrap gap-3">
+                  <a
+                    href={bookingEngineUrl}
+                    target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-6 md:px-7 py-3 md:py-3.5 rounded-2xl font-semibold text-[14px] md:text-[15px] transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
+                    style={{ background: GOLD, color: '#0F1115' }}
+                  >
+                    Book Now
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                      <path d="M2 10L10 2M10 2H5M10 2V7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </a>
+                  <Link
+                    href="#showcase"
+                    className="inline-flex items-center px-6 md:px-7 py-3 md:py-3.5 rounded-2xl font-medium text-[14px] md:text-[15px] text-white border border-white/25 hover:bg-white/10 transition-all duration-200"
+                  >
+                    Explore Rooms
+                  </Link>
+                </div>
               </div>
+            </div>
+
+            {/* Stats bar — flows naturally at bottom, no absolute positioning */}
+            <div
+              className="flex divide-x divide-white/10 backdrop-blur-sm flex-shrink-0"
+              style={{ background: 'rgba(0,0,0,0.44)' }}
+            >
+              {[
+                { label: 'Room Types',  value: `${roomTypes.length || 3}` },
+                { label: 'Total Rooms', value: `${hotelContent.property.totalRooms}+` },
+                { label: 'Check-in',   value: hotelContent.policies.checkIn.time },
+                { label: 'Check-out',  value: hotelContent.policies.checkOut.time },
+              ].map(s => (
+                <div key={s.label} className="flex-1 px-3 md:px-5 py-3 md:py-4 text-center">
+                  <p className="text-[9px] text-white/40 uppercase tracking-wider font-medium leading-none mb-1.5">{s.label}</p>
+                  <p className="text-[13px] md:text-[15px] font-light text-white leading-none">{s.value}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
 
-        <SacredAccent />
+        {/* ══ ROOM TYPE SHOWCASE ════════════════════════════════════════ */}
+        {roomTypes.length > 0 && (
+          <section id="showcase" className="py-16 md:py-24">
+            <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
 
-        {/* Room categories – horizontal scroll (desktop) / stacked (mobile) */}
-        {roomTypes.length > 1 && (
-          <>
-            <section className="max-w-7xl mx-auto px-6 lg:px-8 py-12 md:py-16">
-              <h2
-                className="text-2xl md:text-3xl font-light text-slate-900 dark:text-slate-100 mb-8 tracking-tight"
-                style={{ fontFamily: 'var(--font-playfair-display), Georgia, serif' }}
-              >
-                Room Types
-              </h2>
-              <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide md:flex-wrap md:overflow-visible">
-                {roomTypes.map((type, idx) => {
-                  const img = getRoomTypeImage(type.name, 0);
-                  const isPopular = idx === 1;
-                  return (
-                    <Link
-                      key={type.id}
-                      href={`#room-type-${type.id}`}
-                      className="group flex-shrink-0 w-[280px] md:w-[300px] rounded-[18px] overflow-hidden bg-white/90 dark:bg-slate-800/70 backdrop-blur-sm shadow-[0_8px_32px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.2)] border border-slate-200/50 dark:border-slate-700/40 transition-all duration-300 hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 dark:hover:shadow-[0_12px_40px_rgba(0,0,0,0.25)]"
+              {/* Label */}
+              <div className="flex items-center gap-4 mb-10 md:mb-14">
+                <div className="h-px flex-1 bg-slate-200/60 dark:bg-slate-700/40" />
+                <span className="text-[11px] uppercase tracking-[0.18em] text-slate-400 dark:text-slate-600 font-medium px-1">
+                  Room Types
+                </span>
+                <div className="h-px flex-1 bg-slate-200/60 dark:bg-slate-700/40" />
+              </div>
+
+              {/* Stage: image + info */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-10 items-center">
+
+                {/* Image pane */}
+                <div className="lg:col-span-7">
+                  <div className="relative aspect-[4/3] md:aspect-[16/10] rounded-2xl md:rounded-3xl overflow-hidden bg-slate-100 dark:bg-slate-900 shadow-2xl">
+                    {activeType && (
+                      <Image
+                        src={getRoomTypeImage(activeType.name, COVER_IMG[activeType.name.toLowerCase()] ?? 0)}
+                        alt={activeType.name}
+                        fill quality={95}
+                        className="object-cover transition-opacity duration-300"
+                        sizes="(max-width: 1024px) 100vw, 58vw"
+                        style={{ opacity: imgVisible ? 1 : 0 }}
+                      />
+                    )}
+                    {/* Gradient overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent pointer-events-none" />
+
+                    {/* Counter badge */}
+                    <div
+                      className="absolute top-5 right-5 px-3 py-1.5 rounded-full text-white text-[12px] font-light tracking-widest backdrop-blur-md"
+                      style={{ background: 'rgba(0,0,0,0.38)' }}
                     >
-                      <div className="relative aspect-[4/3] overflow-hidden">
-                        <Image
-                          src={img}
-                          alt={type.name}
-                          fill
-                          className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-                          sizes="300px"
+                      {String(activeIdx + 1).padStart(2, '0')} / {String(roomTypes.length).padStart(2, '0')}
+                    </div>
+
+                    {/* Prev / Next arrows */}
+                    {roomTypes.length > 1 && (
+                      <>
+                        <button
+                          onClick={prev}
+                          className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center text-white transition-all duration-200 hover:scale-110 active:scale-95 backdrop-blur-md"
+                          style={{ background: 'rgba(0,0,0,0.35)' }}
+                          aria-label="Previous room type"
+                        >
+                          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                            <path d="M11 14l-5-5 5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={next}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center text-white transition-all duration-200 hover:scale-110 active:scale-95 backdrop-blur-md"
+                          style={{ background: 'rgba(0,0,0,0.35)' }}
+                          aria-label="Next room type"
+                        >
+                          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                            <path d="M7 4l5 5-5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </button>
+                      </>
+                    )}
+
+                    {/* Dot nav */}
+                    <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-1.5">
+                      {roomTypes.map((_, i) => (
+                        <button
+                          key={i}
+                          onClick={() => switchTo(i)}
+                          className="rounded-full transition-all duration-300"
+                          style={{
+                            width: i === activeIdx ? '22px' : '6px',
+                            height: '6px',
+                            background: i === activeIdx ? GOLD : 'rgba(255,255,255,0.5)',
+                          }}
+                          aria-label={`Room type ${i + 1}`}
                         />
-                        {isPopular && (
-                          <span
-                            className="absolute top-4 left-4 px-3 py-1 rounded-full text-[12px] font-medium uppercase tracking-wider"
-                            style={{ background: GOLD, color: '#0F1115' }}
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Info pane */}
+                <div className="lg:col-span-5 pt-8 lg:pt-0">
+                  {activeType && (
+                    <div
+                      className="transition-all duration-300 ease-out"
+                      style={{ opacity: imgVisible ? 1 : 0, transform: imgVisible ? 'translateY(0)' : 'translateY(8px)' }}
+                    >
+                      {/* Category chip */}
+                      <span
+                        className="inline-block text-[11px] font-medium uppercase tracking-[0.15em] px-3 py-1 rounded-full mb-5"
+                        style={{ background: `${GOLD}15`, color: GOLD }}
+                      >
+                        {activeIdx === 1 ? 'Most Popular' : 'Premium'}
+                      </span>
+
+                      {/* Room name */}
+                      <h2
+                        className="text-3xl md:text-4xl xl:text-5xl font-light text-slate-900 dark:text-slate-100 leading-tight tracking-tight mb-4"
+                        style={{ fontFamily: SERIF }}
+                      >
+                        {activeType.name}
+                      </h2>
+
+                      {/* Price */}
+                      <div className="flex items-baseline gap-2 mb-6">
+                        <span className="text-3xl md:text-4xl font-semibold" style={{ color: GOLD }}>
+                          ₹{activeType.base_price.toLocaleString('en-IN')}
+                        </span>
+                        <span className="text-[14px] text-slate-400 dark:text-slate-500 font-light">/night</span>
+                      </div>
+
+                      <div className="h-px bg-slate-200/70 dark:bg-slate-700/50 mb-6" />
+
+                      {/* Quick stats */}
+                      <div className="flex flex-wrap gap-x-6 gap-y-2 mb-6 text-[13px] text-slate-500 dark:text-slate-400 font-light">
+                        <div className="flex items-center gap-1.5">
+                          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="opacity-60 flex-shrink-0">
+                            <path d="M7 7a2.5 2.5 0 100-5 2.5 2.5 0 000 5zm-4.5 5.5a4.5 4.5 0 019 0" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+                          </svg>
+                          <span>{activeType.max_occupancy} {activeType.max_occupancy === 1 ? 'guest' : 'guests'}</span>
+                        </div>
+                        {activeType.extra_adult_price ? (
+                          <div className="flex items-center gap-1.5">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="opacity-60 flex-shrink-0">
+                              <path d="M10 7a2 2 0 100-4M12.5 12a4 4 0 00-4-4H5.5a4 4 0 00-4 4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+                            </svg>
+                            <span>+₹{activeType.extra_adult_price.toLocaleString('en-IN')} extra adult</span>
+                          </div>
+                        ) : null}
+                      </div>
+
+                      {/* Description */}
+                      <p className="text-[15px] text-slate-600 dark:text-slate-300 font-light leading-relaxed mb-8">
+                        {activeType.description}
+                      </p>
+
+                      {/* CTAs */}
+                      <div className="flex flex-col sm:flex-row gap-3">
+                        <a
+                          href={bookingEngineUrl}
+                          target="_blank" rel="noopener noreferrer"
+                          className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl font-semibold text-[15px] transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
+                          style={{ background: GOLD, color: '#0F1115' }}
+                        >
+                          Book Now
+                          <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+                            <path d="M2 11L11 2M11 2H5M11 2V8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </a>
+                        {!loading && rooms.length > 0 && (
+                          <Link
+                            href="#rooms"
+                            className="inline-flex items-center justify-center px-6 py-3.5 rounded-2xl font-medium text-[15px] border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-all duration-200"
                           >
-                            Most Popular
-                          </span>
+                            View Rooms
+                          </Link>
                         )}
                       </div>
-                      <div className="p-5">
-                        <h3 className="text-[18px] font-medium text-slate-900 dark:text-slate-100 mb-2" style={{ fontFamily: 'var(--font-playfair-display), Georgia, serif' }}>
-                          {type.name}
-                        </h3>
-                        <p className="text-[15px] text-slate-500 dark:text-slate-400 font-light line-clamp-2 mb-3">{type.description}</p>
-                        <p className="text-[20px] font-semibold" style={{ color: GOLD }}>
-                          ₹{type.base_price.toLocaleString('en-IN')}
-                          <span className="text-[14px] font-normal text-slate-500 dark:text-slate-400">/night</span>
-                        </p>
-                      </div>
-                    </Link>
-                  );
-                })}
+                    </div>
+                  )}
+                </div>
               </div>
-            </section>
-            <SacredAccent />
-          </>
+
+              {/* Thumbnail strip */}
+              {roomTypes.length > 1 && (
+                <div className="mt-8 flex gap-4 overflow-x-auto pb-1 scrollbar-hide">
+                  {roomTypes.map((type, idx) => (
+                    <button
+                      key={type.id}
+                      onClick={() => switchTo(idx)}
+                      className="group flex-shrink-0 w-[150px] md:w-[200px] rounded-xl overflow-hidden transition-all duration-300"
+                      style={{
+                        outline: idx === activeIdx ? `2px solid ${GOLD}` : '2px solid transparent',
+                        outlineOffset: '2px',
+                        opacity: idx === activeIdx ? 1 : 0.55,
+                      }}
+                    >
+                      <div className="relative aspect-[4/3]">
+                        <Image
+                          src={getRoomTypeImage(type.name, COVER_IMG[type.name.toLowerCase()] ?? 0)}
+                          alt={type.name}
+                          fill
+                          className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                          sizes="200px"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/65 to-transparent" />
+                        <div className="absolute bottom-0 left-0 right-0 p-2.5 md:p-3">
+                          <p className="text-white text-[11px] md:text-[12px] font-medium leading-tight truncate">{type.name}</p>
+                          <p className="text-white/55 text-[10px] font-light mt-0.5">
+                            ₹{type.base_price.toLocaleString('en-IN')}/night
+                          </p>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
         )}
 
-        {/* Search & filters – glassmorphic, gold accent */}
-        <section id="availability" className="max-w-6xl mx-auto px-6 lg:px-8 pb-12 md:pb-16">
-          <div
-            className={`rounded-[18px] p-6 md:p-8 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.2)] border border-slate-200/50 dark:border-slate-700/40 transition-all duration-600 ease-out ${
-              mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
-            }`}
-          >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              <div>
-                <label className="block text-[12px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-medium mb-2">Check-in</label>
-                <input
-                  type="date"
-                  value={checkIn}
-                  onChange={(e) => setCheckIn(e.target.value)}
-                  min={today}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200/80 dark:border-slate-600/60 bg-white/80 dark:bg-slate-800/50 text-slate-900 dark:text-slate-100 text-[15px] focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/40 focus:border-[#D4AF37]/50 transition-all duration-200"
-                />
+        {/* ══ INDIVIDUAL ROOMS (from API) ═══════════════════════════════ */}
+        {!loading && rooms.length > 0 && (
+          <section id="rooms" className="pb-16 md:pb-20">
+            <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+              <div className="flex items-center gap-4 mb-8">
+                <div className="h-px flex-1 bg-slate-200/60 dark:bg-slate-700/40" />
+                <span className="text-[11px] uppercase tracking-[0.18em] text-slate-400 dark:text-slate-600 font-medium px-1">
+                  Individual Rooms
+                </span>
+                <div className="h-px flex-1 bg-slate-200/60 dark:bg-slate-700/40" />
               </div>
-              <div>
-                <label className="block text-[12px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-medium mb-2">Check-out</label>
-                <input
-                  type="date"
-                  value={checkOut}
-                  onChange={(e) => setCheckOut(e.target.value)}
-                  min={checkIn || tomorrow}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200/80 dark:border-slate-600/60 bg-white/80 dark:bg-slate-800/50 text-slate-900 dark:text-slate-100 text-[15px] focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/40 focus:border-[#D4AF37]/50 transition-all duration-200"
-                />
-              </div>
-              <div className="flex items-end">
-                <button
-                  type="button"
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200/80 dark:border-slate-600/60 bg-white/60 dark:bg-slate-800/40 text-slate-700 dark:text-slate-300 text-[15px] font-medium hover:bg-white/80 dark:hover:bg-slate-800/60 transition-all duration-200 flex items-center justify-center gap-2"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
-                  Filters
-                </button>
-              </div>
-            </div>
-            {showFilters && (
-              <div className="mt-6 pt-6 border-t border-slate-200/60 dark:border-slate-600/40 space-y-6">
-                <div>
-                  <label className="block text-[12px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-medium mb-3">Room Type</label>
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedType(null)}
-                      className={`px-4 py-2.5 rounded-xl text-[14px] font-medium transition-all duration-200 ${
-                        selectedType === null
-                          ? 'text-[#0F1115]'
-                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
-                      }`}
-                      style={{ background: selectedType === null ? GOLD : 'rgba(0,0,0,0.04)' }}
-                    >
-                      All Types
-                    </button>
-                    {roomTypes.map((type) => (
-                      <button
-                        key={type.id}
-                        type="button"
-                        onClick={() => setSelectedType(type.id)}
-                        className={`px-4 py-2.5 rounded-xl text-[14px] font-medium transition-all duration-200 ${
-                          selectedType === type.id ? 'text-[#0F1115]' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
-                        }`}
-                        style={{ background: selectedType === type.id ? GOLD : 'rgba(0,0,0,0.04)' }}
-                      >
-                        {type.name}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-[12px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-medium mb-3">
-                    Price: ₹{priceRange[0].toLocaleString('en-IN')} – ₹{priceRange[1].toLocaleString('en-IN')}
-                  </label>
-                  <div className="grid grid-cols-2 gap-4">
-                    <input
-                      type="number"
-                      value={priceRange[0]}
-                      onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
-                      placeholder="Min"
-                      className="px-4 py-3 rounded-xl border border-slate-200/80 dark:border-slate-600/60 bg-white/80 dark:bg-slate-800/50 text-slate-900 dark:text-slate-100 text-[15px] focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/40"
-                    />
-                    <input
-                      type="number"
-                      value={priceRange[1]}
-                      onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
-                      placeholder="Max"
-                      className="px-4 py-3 rounded-xl border border-slate-200/80 dark:border-slate-600/60 bg-white/80 dark:bg-slate-800/50 text-slate-900 dark:text-slate-100 text-[15px] focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/40"
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </section>
 
-        <SacredAccent />
-
-        {/* Rooms list */}
-        <section className="max-w-7xl mx-auto px-6 lg:px-8 pb-24 md:pb-32">
-          {loading ? (
-            <div className="flex flex-col items-center justify-center py-24">
-              <div className="w-10 h-10 border-2 border-slate-200 dark:border-slate-600 border-t-[#D4AF37] rounded-full animate-spin mb-4" />
-              <p className="text-[15px] text-slate-500 dark:text-slate-400 font-light">Loading rooms...</p>
-            </div>
-          ) : filteredRooms.length === 0 ? (
-            <div className="text-center py-24">
-              <h3 className="text-2xl font-light text-slate-900 dark:text-slate-100 mb-2" style={{ fontFamily: 'var(--font-playfair-display), Georgia, serif' }}>No Rooms Found</h3>
-              <p className="text-[16px] text-slate-500 dark:text-slate-400 font-light mb-8 max-w-md mx-auto">
-                {checkIn && checkOut ? 'No rooms available for the selected dates.' : 'No rooms match your filters.'}
-              </p>
-              <button
-                type="button"
-                onClick={() => { setCheckIn(''); setCheckOut(''); setSelectedType(null); fetchRooms(); }}
-                className="px-6 py-3 rounded-2xl font-medium text-[15px] transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
-                style={{ background: GOLD, color: '#0F1115' }}
-              >
-                Clear Filters
-              </button>
-            </div>
-          ) : (
-            <>
-              <p className="text-center text-[15px] text-slate-500 dark:text-slate-400 font-light mb-12">
-                {filteredRooms.length} {filteredRooms.length === 1 ? 'room' : 'rooms'} available
-              </p>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {filteredRooms.map((room, index) => (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                {rooms.map((room) => (
                   <Link
                     key={room.id}
-                    href={`/rooms/${room.id}${checkIn && checkOut ? `?check_in=${checkIn}&check_out=${checkOut}` : ''}`}
-                    ref={(el) => { roomRefs.current[index] = el as HTMLDivElement | null; }}
-                    className={`group block rounded-[18px] overflow-hidden bg-white/90 dark:bg-slate-800/70 border border-slate-200/60 dark:border-slate-700/40 shadow-[0_8px_32px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.15)] transition-all duration-600 ease-out ${
-                      visibleRooms.has(index) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                    }`}
-                    style={{ transitionDelay: `${index * 80}ms` }}
+                    href={`/rooms/${room.id}`}
+                    className="group flex items-stretch rounded-2xl overflow-hidden bg-white/90 dark:bg-slate-800/70 border border-slate-200/60 dark:border-slate-700/40 shadow-[0_2px_16px_rgba(0,0,0,0.05)] dark:shadow-[0_2px_16px_rgba(0,0,0,0.12)] transition-all duration-200 hover:shadow-[0_6px_28px_rgba(0,0,0,0.08)] hover:-translate-y-0.5"
                   >
-                    <div className="relative h-72 overflow-hidden">
+                    <div className="relative w-28 flex-shrink-0">
                       <Image
                         src={room.image_urls?.[0] || getRoomTypeImage(room.room_type.name, room.id)}
                         alt={room.room_number}
                         fill
-                        quality={95}
-                        className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02]"
-                        sizes="(max-width: 1024px) 100vw, 50vw"
+                        className="object-cover transition-transform duration-400 group-hover:scale-[1.04]"
+                        sizes="112px"
                       />
-                      <div className="absolute top-5 left-5">
-                        <span className="px-3 py-1.5 rounded-xl text-[12px] font-medium bg-white/95 dark:bg-slate-800/95 text-slate-800 dark:text-slate-200 backdrop-blur-sm">
-                          Available
-                        </span>
-                      </div>
                     </div>
-                    <div className="p-6 md:p-8">
-                      <h3
-                        className="text-2xl font-light text-slate-900 dark:text-slate-100 mb-2 tracking-tight"
-                        style={{ fontFamily: 'var(--font-playfair-display), Georgia, serif' }}
-                      >
-                        {room.room_type.name}
-                      </h3>
-                      <p className="text-[15px] text-slate-500 dark:text-slate-400 font-light">Room {room.room_number}{room.floor ? ` · Floor ${room.floor}` : ''}</p>
-                      {room.description && (
-                        <p className="text-[16px] text-slate-600 dark:text-slate-300 font-light mt-4 leading-relaxed line-clamp-2">{room.description}</p>
-                      )}
-                      <div className="flex items-center gap-4 mt-4 text-[14px] text-slate-500 dark:text-slate-400 font-light">
-                        <span>{room.room_type.max_occupancy} {room.room_type.max_occupancy === 1 ? 'guest' : 'guests'}</span>
-                        {room.amenities?.length ? <span>{room.amenities.length} amenities</span> : null}
+                    <div className="flex-1 px-4 py-3.5 flex flex-col justify-between min-w-0">
+                      <div>
+                        <p className="text-[13px] font-semibold text-slate-900 dark:text-slate-100 truncate">{room.room_type.name}</p>
+                        <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">
+                          Room {room.room_number}{room.floor ? ` · Floor ${room.floor}` : ''}
+                        </p>
                       </div>
-                      <div className="mt-6 pt-6 border-t border-slate-200/60 dark:border-slate-600/40 flex items-center justify-between">
-                        <div>
-                          <p className="text-[12px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-medium mb-1">From</p>
-                          <p className="text-2xl font-semibold" style={{ color: GOLD }}>
-                            ₹{room.room_type.base_price.toLocaleString('en-IN')}
-                            <span className="text-[15px] font-normal text-slate-500 dark:text-slate-400">/night</span>
-                          </p>
-                        </div>
-                        <span className="inline-flex items-center justify-center w-12 h-12 rounded-full border-2 border-slate-300/80 dark:border-slate-500/60 text-slate-600 dark:text-slate-400 group-hover:border-[#D4AF37] group-hover:text-[#D4AF37] transition-all duration-200">
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                      <div className="flex items-center justify-between mt-2">
+                        <span className="text-[13px] font-semibold" style={{ color: GOLD }}>
+                          ₹{room.room_type.base_price.toLocaleString('en-IN')}
+                          <span className="text-[10px] font-normal text-slate-400 dark:text-slate-500">/night</span>
                         </span>
+                        <svg className="w-4 h-4 text-slate-300 dark:text-slate-600 group-hover:text-[#D4AF37] transition-colors duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
                       </div>
                     </div>
                   </Link>
                 ))}
               </div>
-            </>
-          )}
-        </section>
+            </div>
+          </section>
+        )}
 
-        {/* Amenities – clean grid, thin icons, generous spacing */}
-        <section id="amenities" className="max-w-6xl mx-auto px-6 lg:px-8 py-16 md:py-24">
-          <h2
-            className="text-2xl md:text-3xl font-light text-slate-900 dark:text-slate-100 mb-10 md:mb-12 tracking-tight text-center"
-            style={{ fontFamily: 'var(--font-playfair-display), Georgia, serif' }}
-          >
-            Amenities at Shivashray
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
-            {(hotelContent.amenities || []).slice(0, 12).map((item, i) => (
-              <div
-                key={i}
-                className="flex flex-col items-center text-center p-6 rounded-2xl border border-slate-200/40 dark:border-slate-600/30 bg-white/50 dark:bg-slate-800/30"
-              >
-                <div className="w-10 h-10 flex items-center justify-center mb-3 text-slate-500 dark:text-slate-400">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-                  </svg>
+        {/* ══ POLICIES STRIP ════════════════════════════════════════════ */}
+        <section
+          className="py-10 md:py-12 border-y border-slate-200/40 dark:border-slate-700/30"
+          style={{ background: 'rgba(212,175,55,0.04)' }}
+        >
+          <div className="max-w-6xl mx-auto px-4 md:px-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-y-6 gap-x-4">
+              {[
+                { label: 'Check-in',       value: '12:00 PM' },
+                { label: 'Check-out',      value: '11:00 AM' },
+                { label: 'Cancellation',   value: '3 Days' },
+                { label: 'Children 0–5',   value: 'Free' },
+                { label: 'Food',           value: 'Veg Only' },
+                { label: 'Smoking',        value: 'Not Allowed' },
+              ].map(p => (
+                <div key={p.label} className="text-center">
+                  <p className="text-[10px] uppercase tracking-[0.12em] text-slate-400 dark:text-slate-600 font-medium mb-1.5">{p.label}</p>
+                  <p className="text-[13px] md:text-[14px] font-medium text-slate-700 dark:text-slate-300">{p.value}</p>
                 </div>
-                <p className="text-[15px] font-medium text-slate-800 dark:text-slate-200">{item.name}</p>
-                {item.description && <p className="text-[13px] text-slate-500 dark:text-slate-400 font-light mt-1 line-clamp-2">{item.description}</p>}
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </section>
 
-        {/* Testimonial snippet – minimal card */}
-        {filteredRooms.length > 0 && (
-          <>
-            <SacredAccent />
-            <section className="max-w-4xl mx-auto px-6 lg:px-8 pb-20 md:pb-28">
-              <blockquote className="rounded-[18px] p-8 md:p-10 text-center bg-white/60 dark:bg-slate-800/60 backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.15)] border border-slate-200/50 dark:border-slate-700/40">
-                <p
-                  className="text-xl md:text-2xl font-light text-slate-700 dark:text-slate-300 leading-relaxed mb-6"
-                  style={{ fontFamily: 'var(--font-playfair-display), Georgia, serif' }}
+        {/* ══ AMENITIES ═════════════════════════════════════════════════ */}
+        <section id="amenities" className="py-16 md:py-24">
+          <div className="max-w-5xl mx-auto px-4 md:px-6 lg:px-8">
+            <div className="text-center mb-10 md:mb-12">
+              <h2
+                className="text-2xl md:text-3xl font-light text-slate-900 dark:text-slate-100 tracking-tight"
+                style={{ fontFamily: SERIF }}
+              >
+                What&apos;s Included
+              </h2>
+              <p className="mt-2 text-[14px] text-slate-400 dark:text-slate-600 font-light tracking-wide">
+                Every room, every night
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3 justify-center">
+              {(hotelContent.amenities || []).slice(0, 14).map((item, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-slate-200/70 dark:border-slate-700/50 bg-white/70 dark:bg-slate-800/40 backdrop-blur-sm"
                 >
-                  “A place of calm in the heart of the city. The room was spotless and the silence at night felt sacred.”
+                  <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: GOLD }} />
+                  <span className="text-[13px] font-medium text-slate-700 dark:text-slate-300">{item.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ══ BOOKING BANNER ════════════════════════════════════════════ */}
+        <section className="pb-16 md:pb-20">
+          <div className="max-w-4xl mx-auto px-4 md:px-6">
+            <div
+              className="relative rounded-3xl overflow-hidden py-14 md:py-16 px-8 md:px-14 text-center"
+              style={{ background: 'linear-gradient(135deg, #78350f 0%, #92400e 38%, #b45309 68%, #78350f 100%)' }}
+            >
+              {/* Dot pattern */}
+              <div
+                className="absolute inset-0 opacity-[0.07]"
+                style={{
+                  backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)',
+                  backgroundSize: '28px 28px',
+                }}
+              />
+              <div className="relative">
+                <p className="text-[10px] uppercase tracking-[0.22em] text-amber-200/65 font-medium mb-3">
+                  Live Availability
                 </p>
-                <footer className="text-[14px] text-slate-500 dark:text-slate-400 font-light">— Guest, Shivashray</footer>
-              </blockquote>
-            </section>
-          </>
-        )}
+                <h2
+                  className="text-3xl md:text-4xl font-light text-white mb-3 tracking-tight"
+                  style={{ fontFamily: SERIF }}
+                >
+                  Ready to Experience Kashi?
+                </h2>
+                <p className="text-[15px] text-white/65 font-light mb-8 max-w-xs mx-auto leading-relaxed">
+                  Secure your stay instantly via our trusted booking partner.
+                </p>
+                <a
+                  href={bookingEngineUrl}
+                  target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2.5 px-10 py-4 rounded-2xl font-semibold text-[16px] transition-all duration-200 hover:scale-[1.03] active:scale-[0.98] shadow-xl"
+                  style={{ background: GOLD, color: '#0F1115' }}
+                >
+                  Book on Stayflexi
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <path d="M2.5 11.5L11.5 2.5M11.5 2.5H5.5M11.5 2.5V8.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ══ TESTIMONIAL ═══════════════════════════════════════════════ */}
+        <section className="pb-28 md:pb-36">
+          <div className="max-w-2xl mx-auto px-6">
+            <blockquote className="text-center">
+              <div
+                className="text-6xl mb-5 leading-none select-none"
+                style={{ color: `${GOLD}38`, fontFamily: SERIF }}
+              >
+                &ldquo;
+              </div>
+              <p
+                className="text-xl md:text-2xl font-light text-slate-700 dark:text-slate-300 leading-relaxed"
+                style={{ fontFamily: SERIF }}
+              >
+                A place of calm in the heart of the city. The room was spotless
+                and the silence at night felt sacred.
+              </p>
+              <div className="mt-7 flex items-center justify-center gap-3">
+                <div className="h-px w-10 bg-slate-300/60 dark:bg-slate-600/40" />
+                <footer className="text-[13px] text-slate-400 dark:text-slate-600 font-light tracking-wide">
+                  Guest, Shivashray
+                </footer>
+                <div className="h-px w-10 bg-slate-300/60 dark:bg-slate-600/40" />
+              </div>
+            </blockquote>
+          </div>
+        </section>
+
       </div>
     </PremiumBackground>
   );

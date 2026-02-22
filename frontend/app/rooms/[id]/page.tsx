@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams, useSearchParams, useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { Room } from '@/types';
 import Image from 'next/image';
@@ -24,14 +24,11 @@ function SacredAccent() {
 
 export default function RoomDetailPage() {
   const params = useParams();
-  const searchParams = useSearchParams();
   const router = useRouter();
   const [room, setRoom] = useState<Room | null>(null);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [checkIn, setCheckIn] = useState(searchParams.get('check_in') || '');
-  const [checkOut, setCheckOut] = useState(searchParams.get('check_out') || '');
   const bookingEngineUrl = getBookingEngineUrl();
 
   useEffect(() => {

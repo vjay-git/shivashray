@@ -127,10 +127,10 @@ export function Features() {
             className="text-[36px] sm:text-[44px] md:text-[52px] font-normal text-[#0E1A2B] leading-[1.1] tracking-tight mb-4"
             style={{ fontFamily: 'var(--font-playfair-display), Georgia, serif' }}
           >
-            Featured Spaces
+            A Glimpse Inside
           </h2>
           <p className="text-[17px] md:text-[18px] text-[#2F5D62] font-normal leading-[1.6] max-w-[560px]">
-            Thoughtfully designed interiors that reflect the calm and elegance of Varanasi.
+            Quiet, unhurried spaces — designed for pilgrims and travellers who value calm over clutter.
           </p>
         </div>
 
