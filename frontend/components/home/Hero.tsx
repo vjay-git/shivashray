@@ -105,10 +105,10 @@ export function Hero() {
 
         {/* Welcoming tagline */}
         <p
-          className="text-[17px] font-light leading-snug mb-8"
-          style={{ color: 'rgba(255,255,255,0.72)', maxWidth: 220 }}
+          className="text-[16px] font-light leading-snug mb-8"
+          style={{ color: 'rgba(255,255,255,0.72)', maxWidth: 240 }}
         >
-          Your sanctuary in the heart of Kashi
+          A peaceful hotel in the heart of Varanasi
         </p>
 
         {/* Full-width CTA */}
