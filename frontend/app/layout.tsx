@@ -43,6 +43,9 @@ export const metadata: Metadata = {
   creator: 'Shiv Ashray',
   publisher: 'Shiv Ashray',
   robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
+  verification: {
+    google: 'jpoZGNkhh98RPiu1idWPgZQVTn0eUeVARmpetPqRP8o',
+  },
   openGraph: {
     type: 'website',
     locale: 'en_IN',
@@ -115,6 +118,39 @@ export default function RootLayout({
                 { '@type': 'LocationFeatureSpecification', name: '24-hour Front Desk', value: true },
               ],
               sameAs: ['https://shivashraybanaras.com'],
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'SiteLinksSearchBox',
+              url: 'https://shivashraybanaras.com',
+              potentialAction: {
+                '@type': 'SearchAction',
+                target: 'https://shivashraybanaras.com/explore?q={search_term_string}',
+                'query-input': 'required name=search_term_string',
+              },
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'ItemList',
+              name: 'Site Navigation',
+              itemListElement: [
+                { '@type': 'SiteNavigationElement', position: 1, name: 'Home',              url: 'https://shivashraybanaras.com/' },
+                { '@type': 'SiteNavigationElement', position: 2, name: 'Rooms',             url: 'https://shivashraybanaras.com/rooms' },
+                { '@type': 'SiteNavigationElement', position: 3, name: 'Experiences',       url: 'https://shivashraybanaras.com/services' },
+                { '@type': 'SiteNavigationElement', position: 4, name: 'Explore Varanasi',  url: 'https://shivashraybanaras.com/explore' },
+                { '@type': 'SiteNavigationElement', position: 5, name: 'About',             url: 'https://shivashraybanaras.com/about' },
+                { '@type': 'SiteNavigationElement', position: 6, name: 'Contact',           url: 'https://shivashraybanaras.com/contact' },
+              ],
             }),
           }}
         />

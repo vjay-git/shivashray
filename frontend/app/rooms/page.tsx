@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import api from '@/lib/api';
-import { Room, RoomType } from '@/types';
+import { RoomType } from '@/types';
 import Link from 'next/link';
 import Image from 'next/image';
 import { hotelContent } from '@/lib/content/hotel-content';
@@ -22,9 +22,7 @@ const COVER_IMG: Record<string, number> = {
 };
 
 export default function RoomsPage() {
-  const [rooms, setRooms]           = useState<Room[]>([]);
   const [roomTypes, setRoomTypes]   = useState<RoomType[]>([]);
-  const [loading, setLoading]       = useState(true);
   const [mounted, setMounted]       = useState(false);
   const [activeIdx, setActiveIdx]   = useState(0);
   const [imgVisible, setImgVisible] = useState(true);
@@ -33,7 +31,6 @@ export default function RoomsPage() {
   useEffect(() => {
     setMounted(true);
     fetchRoomTypes();
-    fetchRooms();
   }, []);
 
   const fetchRoomTypes = async () => {
@@ -42,18 +39,6 @@ export default function RoomsPage() {
       setRoomTypes(res.data?.length ? res.data : hardcodedRoomTypes);
     } catch {
       setRoomTypes(hardcodedRoomTypes);
-    }
-  };
-
-  const fetchRooms = async () => {
-    setLoading(true);
-    try {
-      const res = await api.get('/rooms');
-      setRooms(res.data);
-    } catch {
-      setRooms([]);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -276,11 +261,14 @@ export default function RoomsPage() {
                       </h2>
 
                       {/* Price */}
-                      <div className="flex items-baseline gap-2 mb-6">
-                        <span className="text-3xl md:text-4xl font-semibold" style={{ color: GOLD }}>
-                          ₹{activeType.base_price.toLocaleString('en-IN')}
-                        </span>
-                        <span className="text-[14px] text-slate-400 dark:text-slate-500 font-light">/night</span>
+                      <div className="mb-6">
+                        <p className="text-[11px] text-slate-400 dark:text-slate-500 uppercase tracking-wider font-medium mb-1">Starting from</p>
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-3xl md:text-4xl font-semibold" style={{ color: GOLD }}>
+                            ₹{activeType.base_price.toLocaleString('en-IN')}
+                          </span>
+                          <span className="text-[14px] text-slate-400 dark:text-slate-500 font-light">/night</span>
+                        </div>
                       </div>
 
                       <div className="h-px bg-slate-200/70 dark:bg-slate-700/50 mb-6" />
@@ -298,7 +286,7 @@ export default function RoomsPage() {
                             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="opacity-60 flex-shrink-0">
                               <path d="M10 7a2 2 0 100-4M12.5 12a4 4 0 00-4-4H5.5a4 4 0 00-4 4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
                             </svg>
-                            <span>+₹{activeType.extra_adult_price.toLocaleString('en-IN')} extra adult</span>
+                            <span>Extra guests welcome</span>
                           </div>
                         ) : null}
                       </div>
@@ -321,14 +309,6 @@ export default function RoomsPage() {
                             <path d="M2 11L11 2M11 2H5M11 2V8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         </a>
-                        {!loading && rooms.length > 0 && (
-                          <Link
-                            href="#rooms"
-                            className="inline-flex items-center justify-center px-6 py-3.5 rounded-2xl font-medium text-[15px] border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-all duration-200"
-                          >
-                            View Rooms
-                          </Link>
-                        )}
                       </div>
                     </div>
                   )}
@@ -361,7 +341,7 @@ export default function RoomsPage() {
                         <div className="absolute bottom-0 left-0 right-0 p-2.5 md:p-3">
                           <p className="text-white text-[11px] md:text-[12px] font-medium leading-tight truncate">{type.name}</p>
                           <p className="text-white/55 text-[10px] font-light mt-0.5">
-                            ₹{type.base_price.toLocaleString('en-IN')}/night
+                            from ₹{type.base_price.toLocaleString('en-IN')}
                           </p>
                         </div>
                       </div>
@@ -373,57 +353,6 @@ export default function RoomsPage() {
           </section>
         )}
 
-        {/* ══ INDIVIDUAL ROOMS (from API) ═══════════════════════════════ */}
-        {!loading && rooms.length > 0 && (
-          <section id="rooms" className="pb-16 md:pb-20">
-            <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
-              <div className="flex items-center gap-4 mb-8">
-                <div className="h-px flex-1 bg-slate-200/60 dark:bg-slate-700/40" />
-                <span className="text-[11px] uppercase tracking-[0.18em] text-slate-400 dark:text-slate-600 font-medium px-1">
-                  Individual Rooms
-                </span>
-                <div className="h-px flex-1 bg-slate-200/60 dark:bg-slate-700/40" />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                {rooms.map((room) => (
-                  <Link
-                    key={room.id}
-                    href={`/rooms/${room.id}`}
-                    className="group flex items-stretch rounded-2xl overflow-hidden bg-white/90 dark:bg-slate-800/70 border border-slate-200/60 dark:border-slate-700/40 shadow-[0_2px_16px_rgba(0,0,0,0.05)] dark:shadow-[0_2px_16px_rgba(0,0,0,0.12)] transition-all duration-200 hover:shadow-[0_6px_28px_rgba(0,0,0,0.08)] hover:-translate-y-0.5"
-                  >
-                    <div className="relative w-28 flex-shrink-0">
-                      <Image
-                        src={room.image_urls?.[0] || getRoomTypeImage(room.room_type.name, room.id)}
-                        alt={room.room_number}
-                        fill
-                        className="object-cover transition-transform duration-400 group-hover:scale-[1.04]"
-                        sizes="112px"
-                      />
-                    </div>
-                    <div className="flex-1 px-4 py-3.5 flex flex-col justify-between min-w-0">
-                      <div>
-                        <p className="text-[13px] font-semibold text-slate-900 dark:text-slate-100 truncate">{room.room_type.name}</p>
-                        <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">
-                          Room {room.room_number}{room.floor ? ` · Floor ${room.floor}` : ''}
-                        </p>
-                      </div>
-                      <div className="flex items-center justify-between mt-2">
-                        <span className="text-[13px] font-semibold" style={{ color: GOLD }}>
-                          ₹{room.room_type.base_price.toLocaleString('en-IN')}
-                          <span className="text-[10px] font-normal text-slate-400 dark:text-slate-500">/night</span>
-                        </span>
-                        <svg className="w-4 h-4 text-slate-300 dark:text-slate-600 group-hover:text-[#D4AF37] transition-colors duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
 
         {/* ══ POLICIES STRIP ════════════════════════════════════════════ */}
         <section

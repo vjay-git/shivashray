@@ -253,24 +253,14 @@ export function RoomsPreview() {
                 )}
                 <div className="pt-4 border-t border-[#C6A75E]/15 space-y-3">
                   <div>
-                    <p className="text-[12px] text-[#2F5D62] uppercase tracking-wider font-medium mb-1">
-                      {roomType.name.includes('Family Room') ? 'Quad Occupancy' : 'Double Occupancy'}
+                    <p className="text-[11px] text-[#2F5D62]/70 uppercase tracking-wider font-medium mb-1">
+                      Starting from
                     </p>
                     <p className="text-[20px] font-semibold text-[#0E1A2B]">
                       ₹{roomType.base_price.toLocaleString('en-IN')}
                       <span className="text-[15px] font-normal text-[#2F5D62]">/night</span>
                     </p>
                   </div>
-                  {(roomType.extra_adult_price || roomType.child_price) && (
-                    <div className="text-[13px] text-[#2F5D62] space-y-1">
-                      {roomType.extra_adult_price && (
-                        <p>Extra Adult: ₹{roomType.extra_adult_price.toLocaleString('en-IN')}/night</p>
-                      )}
-                      {roomType.child_price && (
-                        <p>Child: ₹{roomType.child_price.toLocaleString('en-IN')}/night</p>
-                      )}
-                    </div>
-                  )}
                   <div className="pt-2 flex items-center text-[#C6A75E] font-medium text-[14px] group-hover:text-[#0E1A2B] transition-colors">
                     <span>View Details</span>
                     <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
