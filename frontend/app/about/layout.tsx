@@ -1,13 +1,13 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'About Us',
+  title: 'About Us — A Sanctuary Rooted in Devotion',
   description:
-    'Learn about Shiv Ashray — a premier hotel in the heart of Varanasi\'s old city, 220 m from Kashi Vishwanath Temple. 25 rooms, 3 floors, modern amenities with a spiritual touch.',
+    'Discover Shiv Ashray — a boutique hotel in Varanasi\'s sacred old city. 25 rooms, 2 min from Kashi Vishwanath Temple, built with devotion, warmth, and the spirit of Kashi.',
   openGraph: {
-    title: 'About Shiv Ashray — Premier Hotel in Varanasi',
+    title: 'About Shiv Ashray — Sanctuary in the Heart of Kashi',
     description:
-      'Shiv Ashray blends tradition and modern comfort in the spiritual capital of India, steps from the Kashi Vishwanath Temple and Ganga Ghats.',
+      'Steps from Kashi Vishwanath, the Ganga Ghats, and Kal Bhairav. 25 rooms, modern amenities, and the warmth of a home rooted in Varanasi\'s sacred spirit.',
     images: [{ url: '/property_2.jpg', width: 1200, height: 630, alt: 'Shiv Ashray Hotel, Varanasi' }],
   },
 };

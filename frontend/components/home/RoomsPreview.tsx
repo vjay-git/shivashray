@@ -2,20 +2,20 @@
 
 import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import api from '@/lib/api';
 import { RoomType } from '@/types';
-import Link from 'next/link';
 import { getRoomTypeImages } from '@/lib/utils/room-images';
 import { hardcodedRoomTypes } from '@/lib/data/room-types';
+import { getBookingEngineUrl } from '@/lib/booking-engine';
 
-// Room card slideshow component
-function RoomCardSlideshow({ 
-  roomTypeName, 
-  roomId 
-}: { 
-  roomTypeName: string; 
-  roomId: number;
-}) {
+const ROOM_TAGS: Record<string, string[]> = {
+  'Deluxe Room':       ['Free WiFi', 'AC', 'Hot Water', 'TV', '2 Guests'],
+  'Super Deluxe Room': ['Free WiFi', 'AC', 'Hot Water', 'TV', 'Mirror Wall', '2 Guests'],
+  'Family Room':       ['Free WiFi', 'AC', 'Hot Water', 'TV', 'Up to 4 Guests'],
+};
+
+function RoomCardSlideshow({ roomTypeName, roomId }: { roomTypeName: string; roomId: number }) {
   const images = getRoomTypeImages(roomTypeName);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
@@ -25,26 +25,16 @@ function RoomCardSlideshow({
     if (!isHovered && images.length > 1) {
       intervalRef.current = setInterval(() => {
         setCurrentIndex((prev) => (prev + 1) % images.length);
-      }, 3000); // Change image every 3 seconds
+      }, 3000);
     } else {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
+      if (intervalRef.current) clearInterval(intervalRef.current);
     }
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [isHovered, images.length]);
 
   const goToSlide = (index: number) => {
     setCurrentIndex(index);
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
-    // Restart auto-play after manual navigation
+    if (intervalRef.current) clearInterval(intervalRef.current);
     if (!isHovered && images.length > 1) {
       intervalRef.current = setInterval(() => {
         setCurrentIndex((prev) => (prev + 1) % images.length);
@@ -56,47 +46,38 @@ function RoomCardSlideshow({
 
   return (
     <div
-      className="relative h-64 bg-gray-100/50 overflow-hidden group/slideshow"
+      className="relative h-56 bg-gray-100 overflow-hidden"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Images */}
-      <div className="relative w-full h-full">
-        {images.map((src, index) => (
-          <div
-            key={`${roomId}-${index}`}
-            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
-              index === currentIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'
-            }`}
-          >
-            <Image
-              src={src}
-              alt={`${roomTypeName} - Image ${index + 1}`}
-              fill
-              quality={100}
-              className="object-cover group-hover/slideshow:scale-105 transition-transform duration-700 ease-out"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              priority={index === 0}
-            />
-          </div>
-        ))}
-      </div>
+      {images.map((src, index) => (
+        <div
+          key={`${roomId}-${index}`}
+          className={`absolute inset-0 transition-opacity duration-700 ${
+            index === currentIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'
+          }`}
+        >
+          <Image
+            src={src}
+            alt={`${roomTypeName} - Image ${index + 1}`}
+            fill
+            quality={90}
+            className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            priority={index === 0}
+          />
+        </div>
+      ))}
 
-      {/* Navigation Dots */}
+      {/* Dots */}
       {images.length > 1 && (
         <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5">
           {images.map((_, index) => (
             <button
               key={index}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                goToSlide(index);
-              }}
-              className={`transition-all duration-300 rounded-full ${
-                index === currentIndex
-                  ? 'w-2 h-2 bg-white'
-                  : 'w-1.5 h-1.5 bg-white/50 hover:bg-white/70'
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); goToSlide(index); }}
+              className={`rounded-full transition-all duration-300 ${
+                index === currentIndex ? 'w-2 h-2 bg-white' : 'w-1.5 h-1.5 bg-white/50'
               }`}
               aria-label={`Go to slide ${index + 1}`}
             />
@@ -104,36 +85,26 @@ function RoomCardSlideshow({
         </div>
       )}
 
-      {/* Previous/Next Buttons (shown on hover) */}
+      {/* Prev / Next */}
       {images.length > 1 && isHovered && (
         <>
           <button
             type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              goToSlide((currentIndex - 1 + images.length) % images.length);
-            }}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); goToSlide((currentIndex - 1 + images.length) % images.length); }}
             onMouseDown={(e) => e.preventDefault()}
-            className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-white/95 backdrop-blur-sm flex items-center justify-center text-gray-900 hover:bg-white hover:scale-110 active:scale-95 transition-all duration-200 shadow-lg border border-white/20"
-            aria-label="Previous image"
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center shadow-md hover:bg-white transition-colors"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
           <button
             type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              goToSlide((currentIndex + 1) % images.length);
-            }}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); goToSlide((currentIndex + 1) % images.length); }}
             onMouseDown={(e) => e.preventDefault()}
-            className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-white/95 backdrop-blur-sm flex items-center justify-center text-gray-900 hover:bg-white hover:scale-110 active:scale-95 transition-all duration-200 shadow-lg border border-white/20"
-            aria-label="Next image"
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center shadow-md hover:bg-white transition-colors"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
             </svg>
           </button>
@@ -146,144 +117,134 @@ function RoomCardSlideshow({
 export function RoomsPreview() {
   const [roomTypes, setRoomTypes] = useState<RoomType[]>(hardcodedRoomTypes);
   const [loading, setLoading] = useState(true);
-  const [mounted, setMounted] = useState(false);
-  const [visibleItems, setVisibleItems] = useState<Set<number>>(new Set());
-  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const bookingUrl = getBookingEngineUrl();
 
   useEffect(() => {
-    setMounted(true);
-    fetchRoomTypes();
+    api.get('/rooms/types')
+      .then((res) => {
+        if (res.data && res.data.length > 0) setRoomTypes(res.data.slice(0, 3));
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => {
-    const observers = itemRefs.current.map((ref, index) => {
-      if (!ref) return null;
-      
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              setVisibleItems((prev) => new Set(prev).add(index));
-            }
-          });
-        },
-        { threshold: 0.2, rootMargin: '-50px' }
-      );
-      
-      observer.observe(ref);
-      return observer;
-    });
-
-    return () => {
-      observers.forEach((observer) => observer?.disconnect());
-    };
-  }, [roomTypes]);
-
-  const fetchRoomTypes = async () => {
-    try {
-      const response = await api.get('/rooms/types');
-      // Use API data if available, otherwise fallback to hardcoded
-      if (response.data && response.data.length > 0) {
-        setRoomTypes(response.data.slice(0, 3));
-      } else {
-        setRoomTypes(hardcodedRoomTypes);
-      }
-    } catch (error) {
-      // On error, use hardcoded data
-      console.error('Error fetching room types, using hardcoded data:', error);
-      setRoomTypes(hardcodedRoomTypes);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
-    return null;
-  }
-
-  if (roomTypes.length === 0) {
-    return null;
-  }
+  if (loading) return null;
+  if (roomTypes.length === 0) return null;
 
   return (
-    <section className="py-20 md:py-28 bg-[#F8F6F2] relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        {/* Section Header – serif title */}
-        <div
-          className={`text-center mb-14 md:mb-16 transition-all duration-1000 ease-out ${
-            mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-          }`}
-        >
-          <h2
-            className="text-[36px] sm:text-[44px] md:text-[52px] font-normal text-[#0E1A2B] mb-4 tracking-tight"
-            style={{ fontFamily: 'var(--font-playfair-display), Georgia, serif' }}
-          >
-            Our Rooms
-          </h2>
-          <p className="text-[17px] md:text-[18px] text-[#2F5D62] font-normal max-w-2xl mx-auto">
-            Thoughtfully designed spaces for your comfort
-          </p>
-        </div>
+    <section className="bg-white py-14 md:py-20 px-4 md:px-8 lg:px-12">
+      <div className="max-w-7xl mx-auto">
 
-        {/* Rooms Grid – gold hover outline, soft shadow */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
-          {roomTypes.map((roomType, index) => (
-            <Link
-              key={roomType.id}
-              href="/rooms"
-              ref={(el) => { itemRefs.current[index] = el as HTMLDivElement | null; }}
-              className={`group bg-[#F5F1E8] rounded-[14px] overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.06)] border border-[#C6A75E]/10 hover:shadow-[0_20px_60px_rgba(0,0,0,0.1)] hover:ring-2 hover:ring-[#C6A75E]/30 hover:ring-offset-2 hover:ring-offset-[#F8F6F2] hover:-translate-y-0.5 transition-all duration-500 ease-out ${
-                visibleItems.has(index) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-              }`}
-              style={{ transitionDelay: `${index * 100}ms` }}
-            >
-              <RoomCardSlideshow roomTypeName={roomType.name} roomId={roomType.id} />
-
-              <div className="p-6 md:p-8">
-                <h3
-                  className="text-[22px] md:text-[24px] font-semibold text-[#0E1A2B] mb-2 tracking-tight"
-                  style={{ fontFamily: 'var(--font-playfair-display), Georgia, serif' }}
-                >
-                  {roomType.name}
-                </h3>
-                {roomType.description && (
-                  <p className="text-[15px] text-[#2F5D62] font-normal mb-4 leading-relaxed line-clamp-2">
-                    {roomType.description}
-                  </p>
-                )}
-                <div className="pt-4 border-t border-[#C6A75E]/15 space-y-3">
-                  <div>
-                    <p className="text-[11px] text-[#2F5D62]/70 uppercase tracking-wider font-medium mb-1">
-                      Starting from
-                    </p>
-                    <p className="text-[20px] font-semibold text-[#0E1A2B]">
-                      ₹{roomType.base_price.toLocaleString('en-IN')}
-                      <span className="text-[15px] font-normal text-[#2F5D62]">/night</span>
-                    </p>
-                  </div>
-                  <div className="pt-2 flex items-center text-[#C6A75E] font-medium text-[14px] group-hover:text-[#0E1A2B] transition-colors">
-                    <span>View Details</span>
-                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        <div className="text-center mt-12">
+        {/* Header */}
+        <div className="flex items-end justify-between mb-8 md:mb-10">
+          <div>
+            <span className="inline-block text-xs font-bold uppercase tracking-widest text-amber-600 bg-amber-50 border border-amber-100 px-3 py-1 rounded-full mb-3">
+              Rooms &amp; Rates
+            </span>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Choose Your Room</h2>
+            <p className="text-gray-500 text-sm mt-1">All rooms include complimentary breakfast &amp; free WiFi</p>
+          </div>
           <Link
             href="/rooms"
-            className="inline-flex items-center space-x-2 text-[17px] font-medium text-[#0E1A2B] hover:text-[#C6A75E] transition-colors duration-300"
+            className="hidden sm:inline-flex items-center gap-1.5 text-sm font-semibold text-amber-700 hover:text-amber-800 underline underline-offset-2"
           >
-            <span>View all rooms</span>
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            View all rooms
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </Link>
         </div>
+
+        {/* Cards grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {roomTypes.map((roomType) => {
+            const tags = ROOM_TAGS[roomType.name] ?? ['Free WiFi', 'AC', 'Hot Water'];
+            return (
+              <div
+                key={roomType.id}
+                className="group bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:border-amber-200 transition-all duration-300 flex flex-col"
+              >
+                {/* Image slideshow */}
+                <RoomCardSlideshow roomTypeName={roomType.name} roomId={roomType.id} />
+
+                {/* Card body */}
+                <div className="p-5 flex flex-col flex-1">
+                  {/* Name + rating */}
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <h3 className="font-bold text-gray-900 text-[17px] leading-snug">{roomType.name}</h3>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <svg className="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                      <span className="text-xs font-semibold text-gray-700">5.0</span>
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  {roomType.description && (
+                    <p className="text-gray-500 text-[13px] leading-relaxed mb-3 line-clamp-2">
+                      {roomType.description}
+                    </p>
+                  )}
+
+                  {/* Amenity tags */}
+                  <div className="flex flex-wrap gap-1.5 mb-4">
+                    {tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="text-[11px] font-medium text-gray-600 bg-gray-100 border border-gray-200 px-2 py-0.5 rounded-full"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* Price + buttons */}
+                  <div className="mt-auto pt-4 border-t border-gray-100">
+                    <div className="flex items-end justify-between mb-3">
+                      <div>
+                        <p className="text-[11px] text-gray-400 uppercase tracking-wider font-medium">Starting from</p>
+                        <p className="text-[22px] font-bold text-gray-900 leading-none mt-0.5">
+                          ₹{roomType.base_price.toLocaleString('en-IN')}
+                          <span className="text-sm font-normal text-gray-500 ml-1">/night</span>
+                        </p>
+                      </div>
+                      <span className="text-[11px] text-emerald-600 font-semibold bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full">
+                        Free cancellation
+                      </span>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Link
+                        href="/rooms"
+                        className="flex-1 text-center py-2.5 rounded-xl border border-gray-200 text-[13px] font-semibold text-gray-700 hover:border-amber-300 hover:text-amber-700 transition-colors"
+                      >
+                        View Details
+                      </Link>
+                      <a
+                        href={bookingUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 text-center py-2.5 rounded-xl text-[13px] font-bold text-gray-900 transition-all duration-200 hover:brightness-110 active:scale-[0.97]"
+                        style={{ background: 'linear-gradient(135deg, #C6A75E, #D4AF37)' }}
+                      >
+                        Book Now
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Mobile view all */}
+        <div className="sm:hidden mt-6 text-center">
+          <Link href="/rooms" className="text-sm font-semibold text-amber-700 underline underline-offset-2">
+            View all rooms →
+          </Link>
+        </div>
+
       </div>
     </section>
   );

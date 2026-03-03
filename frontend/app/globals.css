@@ -333,3 +333,44 @@
     transform: scale(1.05);
   }
 }
+
+/* Hotel title animations */
+@keyframes titleShimmer {
+  0%   { background-position: -250% center; }
+  100% { background-position: 250% center; }
+}
+
+@keyframes goldGlow {
+  0%, 100% {
+    opacity: 0.75;
+    filter: drop-shadow(0 0 4px rgba(212,175,55,0.2));
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 14px rgba(212,175,55,0.85)) drop-shadow(0 0 28px rgba(212,175,55,0.35));
+  }
+}
+
+@layer utilities {
+  .title-shimmer {
+    background: linear-gradient(
+      90deg,
+      rgba(255,255,255,0.75) 0%,
+      rgba(255,255,255,0.95) 30%,
+      rgba(255,248,210,1)    42%,
+      rgba(255,255,255,1)    50%,
+      rgba(255,248,210,1)    58%,
+      rgba(255,255,255,0.95) 70%,
+      rgba(255,255,255,0.75) 100%
+    );
+    background-size: 300% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: titleShimmer 4s linear infinite;
+  }
+
+  .title-gold-glow {
+    animation: goldGlow 2.8s ease-in-out infinite;
+  }
+}

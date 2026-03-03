@@ -28,7 +28,7 @@ export const places: Place[] = [
     travelHint: '½ minute walk through the old city lanes',
     mapAngle: 245,
     mapDistanceKm: 0.22,
-    imageUrl: '/lordshiva.jpg',
+    imageUrl: '/kashi_temple.jpg',
     content: {
       introduction: 'Kashi Vishwanath Temple stands as one of the most revered shrines in Hinduism, dedicated to Lord Shiva. The golden spire has guided pilgrims for centuries.',
       culturalContext: 'The temple corridor contains many smaller shrines. The current structure dates to the 18th century. The golden shikhara is visible across the rooftops of the old city.',
@@ -46,7 +46,6 @@ export const places: Place[] = [
     travelHint: 'Walk alongside Kashi Vishwanath, 250 m from hotel',
     mapAngle: 248,
     mapDistanceKm: 0.25,
-    imageUrl: '/lordshiva1.jpg',
     content: {
       introduction: 'Annapurna Temple honours the goddess who blesses devotees with nourishment. It is one of the most beloved temples in the Vishwanath corridor and sees a constant stream of worshippers.',
       spiritualContext: 'Goddess Annapurna is the divine embodiment of food and nourishment. Pilgrims offer prayers here before or after visiting Kashi Vishwanath.',
@@ -63,7 +62,6 @@ export const places: Place[] = [
     travelHint: 'Short walk through the old city lanes',
     mapAngle: 252,
     mapDistanceKm: 0.25,
-    imageUrl: '/lordshiva2.jpg',
     content: {
       introduction: 'Raj Rajeshwari Temple is dedicated to the supreme goddess of the universe, venerated in the Shakta tradition. The temple blends peaceful devotion with the vibrant energy of old Varanasi.',
       spiritualContext: 'Raj Rajeshwari (also called Tripura Sundari) represents the highest form of Shakti. The temple is frequented by both regular devotees and passing pilgrims.',
@@ -97,7 +95,6 @@ export const places: Place[] = [
     travelHint: '5 minute walk south from the hotel',
     mapAngle: 188,
     mapDistanceKm: 0.45,
-    imageUrl: '/lordshiva1.jpg',
     content: {
       introduction: 'Baglamukhi Temple is one of the ten Mahavidyas and is revered for granting victory over enemies and obstacles. The temple sees intense worship especially during Navratri.',
       spiritualContext: 'Goddess Baglamukhi is depicted in yellow, symbolising power and control. Tantric rituals and fire sacrifices (homams) are regularly performed here.',
@@ -114,7 +111,6 @@ export const places: Place[] = [
     travelHint: '6–7 minute walk to the ghats',
     mapAngle: 278,
     mapDistanceKm: 0.5,
-    imageUrl: '/lordshiva2.jpg',
     content: {
       introduction: 'Manikarnika Ghat is the most sacred cremation ground in Hinduism. Funeral pyres burn here 24 hours a day, 365 days a year. Hindus believe dying here brings instant moksha.',
       culturalContext: 'Legend says the earring of Sati fell here, giving the ghat its name. The Charanpaduka at the top marks where Vishnu\'s footprint is said to be. All 80 ghats of Varanasi are connected along the riverfront — boats are available at every ghat.',
@@ -262,7 +258,6 @@ export const places: Place[] = [
     travelHint: 'Evening Aarti at sunset; Butter Dosa stalls open 7–11 am',
     mapAngle: 232,
     mapDistanceKm: 1.0,
-    imageUrl: '/lordshiva1.jpg',
     content: {
       introduction: 'Dashashwamedh Ghat is one of the oldest and most vibrant ghats in Varanasi. Every evening, the Ganga Aarti ceremony transforms the space into a mesmerising spectacle of fire, bells, and chants.',
       culturalContext: 'The ghat is named after the ten (Dasha) horse-sacrifices (Ashwamedh) performed here by Lord Brahma. Excellent Butter Dosa and Idli shops operate near the ghat from 7 am to 11 am.',
@@ -327,7 +322,6 @@ export const places: Place[] = [
     travelHint: '12 min by auto; visit in the morning or evening',
     mapAngle: 207,
     mapDistanceKm: 3.6,
-    imageUrl: '/lordshiva.jpg',
     content: {
       introduction: 'Durga Kund Temple is one of the most striking temples in Varanasi, built in Nagara style with vibrant red ochre and set beside a large sacred tank (kund). The temple is dedicated to Goddess Durga.',
       culturalContext: 'The temple complex includes the ancient kund where monkeys are a regular presence. Many restaurants and cafes cluster in the nearby Gurudham Colony — notably Kerala Cafe (8 am–10 pm).',
@@ -345,7 +339,6 @@ export const places: Place[] = [
     travelHint: 'Easy auto ride (12 min); pair with Durga Kund visit',
     mapAngle: 203,
     mapDistanceKm: 3.7,
-    imageUrl: '/lordshiva1.jpg',
     content: {
       introduction: 'Tulsi Manas Temple is dedicated to Lord Rama and built at the very site where Tulsidas composed the Ramcharitmanas — the beloved Hindi Ramayana.',
       culturalContext: 'The temple walls are inscribed with verses from the Ramcharitmanas, making it a unique blend of architecture and scripture. The white marble structure stands adjacent to Durga Kund.',
@@ -363,7 +356,6 @@ export const places: Place[] = [
     travelHint: 'Morning boat ride or 15 min auto ride',
     mapAngle: 197,
     mapDistanceKm: 4.0,
-    imageUrl: '/lordshiva2.jpg',
     content: {
       introduction: 'Assi Ghat marks the confluence of the Assi River with the Ganges. The southernmost ghat offers a more tranquil atmosphere with morning yoga sessions and sunrise boat rides.',
       culturalContext: 'Popular with academics, artists and long-term visitors who enjoy the quieter riverside life. A large peepul tree on the ghat is a gathering point for pilgrims.',
@@ -380,7 +372,6 @@ export const places: Place[] = [
     travelHint: '15 min by auto; Tuesday and Saturday are most auspicious',
     mapAngle: 199,
     mapDistanceKm: 4.4,
-    imageUrl: '/lordshiva.jpg',
     content: {
       introduction: 'Sankat Mochan Hanuman Temple is one of the most beloved temples in Varanasi, dedicated to Lord Hanuman the remover of obstacles (Sankat Mochan). The temple has a serene, tree-shaded compound.',
       culturalContext: 'The temple was established by Tulsidas himself and is steeped in the Ramayana tradition. Live devotional music (bhajans) fills the air especially on Tuesdays and Saturdays.',
@@ -398,7 +389,6 @@ export const places: Place[] = [
     travelHint: '18 min by auto; combine with Assi Ghat and Sankat Mochan',
     mapAngle: 196,
     mapDistanceKm: 5.4,
-    imageUrl: '/lordshiva2.jpg',
     content: {
       introduction: 'Banaras Hindu University, founded in 1916 by Madan Mohan Malaviya, is one of Asia\'s largest residential universities. Its campus spans 1,300+ acres with temples, museums and gardens.',
       culturalContext: 'The campus houses Bharat Kala Bhavan (art museum), Vishwanath Temple and the New Vishwanath Temple with its towering white spire. Student food stalls near the gates serve legendary Lassi, Cold Coffee, Samosa and Dosa.',
@@ -430,7 +420,6 @@ export const places: Place[] = [
     travelHint: '25 min by auto; open all day, best in early morning',
     mapAngle: 18,
     mapDistanceKm: 8.3,
-    imageUrl: '/lordshiva2.jpg',
     content: {
       introduction: 'Sarnath is one of the four most important Buddhist pilgrimage sites in the world. It was here, in the Deer Park, that the Buddha gave his first sermon after attaining enlightenment.',
       culturalContext: 'The site contains the Dhamek Stupa, Ashoka Pillar, and a fine archaeological museum. Multiple monasteries represent Tibetan, Japanese, Chinese and Sri Lankan Buddhist traditions.',
@@ -448,7 +437,6 @@ export const places: Place[] = [
     travelHint: '35 min by road or scenic boat-and-auto combination',
     mapAngle: 108,
     mapDistanceKm: 14.0,
-    imageUrl: '/lordshiva.jpg',
     content: {
       introduction: 'Ramnagar Fort, built in the 18th century, stands on the eastern bank of the Ganges opposite Varanasi. It houses the royal museum of the Maharaja of Banaras with vintage cars, palanquins and manuscripts.',
       culturalContext: 'The fort is the venue for the famous Ram Lila of Ramnagar — a month-long theatrical production of the Ramayana, considered one of the greatest cultural events in India.',
@@ -480,7 +468,6 @@ export const places: Place[] = [
     travelHint: 'Day trip; ~1 hour drive; take packed lunch',
     mapAngle: 168,
     mapDistanceKm: 35.0,
-    imageUrl: '/lordshiva1.jpg',
     content: {
       introduction: 'Chunar Fort, perched on a rocky bluff overlooking the Ganges, has witnessed over two millennia of history — from the Mauryas and Mughals to the British. The views of the river from the battlements are stunning.',
       culturalContext: 'The fort complex includes ancient temples, a stepwell (baoli), and the tomb of Shaji Khan. Chunar is also famous for its red clay pottery.',
