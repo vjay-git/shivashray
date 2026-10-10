@@ -63,7 +63,7 @@ export function Footer() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
               </svg>
-              25/14, Kachaudi Gali, Lahori Tola,<br />Varanasi, UP — 221001
+              CK 25/14, Kachori Gali, Chowk,<br />Near Chowk Thana,<br />Varanasi, UP — 221001
             </a>
           </div>
 

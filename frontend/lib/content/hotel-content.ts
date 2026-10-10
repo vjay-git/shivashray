@@ -12,11 +12,11 @@ export const hotelContent = {
   
   // Location
   location: {
-    address: 'Shiv Ashray, 25/14, Kachaudi Gali, Lahori Tola, Varanasi, Uttar Pradesh, India - 221001',
+    address: 'Shiv Ashray, CK 25/14, Kachori Gali, Chowk (Near Chowk Thana), Varanasi, Uttar Pradesh, India - 221001',
     city: 'Varanasi',
     state: 'Uttar Pradesh',
     pincode: '221001',
-    googleMapsUrl: 'https://maps.app.goo.gl/nGkDab58p3uh257E9',
+    googleMapsUrl: 'https://www.google.com/maps?cid=9450043541275721731',
     proximity: 'Conveniently located near the Kashi Vishwanath Temple, allowing easy access to sacred sites along the Ghats of the Ganges',
     // City center highlights
     cityCenter: true,
@@ -206,7 +206,7 @@ export const hotelContent = {
         'Whether you\'re here for a pilgrimage, Ganga Aarti, or a tranquil retreat, our personalized services ensure a memorable stay. Discover comfort and spirituality in one place. 🏨🙏',
         'From Deluxe Rooms to Super Deluxe and Family Rooms, find your perfect accommodation in Varanasi. All 25 rooms feature modern amenities while maintaining the spiritual essence of the holy city. 🛏️',
         'Enjoy our premium amenities including Reception, Lobby, Power Backup, WiFi, CCTV, Fire Safety, Doctor on Call, First Aid, and Lift. Everything you need for a comfortable stay! 🏨✨',
-        'Located at Shiv Ashray, 25/14, Kachaudi Gali, Lahori Tola - just moments away from the sacred Ghats of the Ganges. Your spiritual journey begins here. 📍🌊',
+        'Located at Shiv Ashray, CK 25/14, Kachori Gali, Chowk (near Chowk Thana) - just moments away from the sacred Ghats of the Ganges. Your spiritual journey begins here. 📍🌊',
       ],
       hashtags: [
         '#ShivAshray',
@@ -224,10 +224,10 @@ export const hotelContent = {
     },
     whatsapp: {
       greeting: 'Namaste! Welcome to Shiv Ashray. How can we assist you today?',
-      booking: 'Thank you for choosing Shiv Ashray! We\'re located at Shiv Ashray, 25/14, Kachaudi Gali, Lahori Tola, Varanasi, just near the Kashi Vishwanath Temple. Our rooms include Deluxe, Super Deluxe, and Family Room options, all with modern amenities. Would you like to check availability?',
+      booking: 'Thank you for choosing Shiv Ashray! We\'re located at Shiv Ashray, CK 25/14, Kachori Gali, Chowk, Varanasi (near Chowk Thana), just near the Kashi Vishwanath Temple. Our rooms include Deluxe, Super Deluxe, and Family Room options, all with modern amenities. Would you like to check availability?',
       amenities: 'Our amenities include: Reception, Lobby, Power Backup, WiFi, CCTV in Common Area, Fire Safety, Doctor on Call, First Aid Kit, and Lift.',
-      location: 'We\'re conveniently located at Shiv Ashray, 25/14, Kachaudi Gali, Lahori Tola, Varanasi, Uttar Pradesh, India - 221001. We\'re just steps away from the Kashi Vishwanath Temple and the sacred Ghats of the Ganges.',
-      contact: 'You can reach us at:\n📞 Phone: +91 9369353505\n📧 Email: shivashrayvns@gmail.com\n👤 Contact Person: Shalini Agarwal\n📍 Address: Shiv Ashray, 25/14, Kachaudi Gali, Lahori Tola, Varanasi, UP 221001',
+      location: 'We\'re conveniently located at Shiv Ashray, CK 25/14, Kachori Gali, Chowk (Near Chowk Thana), Varanasi, Uttar Pradesh, India - 221001. We\'re just steps away from the Kashi Vishwanath Temple and the sacred Ghats of the Ganges.',
+      contact: 'You can reach us at:\n📞 Phone: +91 9369353505\n📧 Email: shivashrayvns@gmail.com\n👤 Contact Person: Shalini Agarwal\n📍 Address: Shiv Ashray, CK 25/14, Kachori Gali, Chowk (Near Chowk Thana), Varanasi, UP 221001',
     },
   },
 

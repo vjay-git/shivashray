@@ -327,7 +327,7 @@ export default function ContactPage() {
           <div className="rounded-[20px] overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.15)] border border-slate-200/50 dark:border-slate-700/40">
             <div className="relative w-full aspect-[21/9] md:aspect-[3/1] bg-slate-100 dark:bg-slate-800/50">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3609.1234567890123!2d83.0104!3d25.3176!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x398e2db76febcf4d%3A0x68131710853ff0b5!2sKashi%20Vishwanath%20Temple!5e0!3m2!1sen!2sin!4v1234567890123!5m2!1sen!2sin"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3606.735866071418!2d83.00883451128216!3d25.313076926903534!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x398e2f0033162a4d%3A0x83254c8845b6c003!2sShiv%20Ashray!5e0!3m2!1sen!2sin!4v1791631744514!5m2!1sen!2sin"
                 width="100%"
                 height="100%"
                 style={{ border: 0, filter: 'grayscale(20%) contrast(1.02)' }}
