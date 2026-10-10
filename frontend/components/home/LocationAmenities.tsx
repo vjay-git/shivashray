@@ -63,7 +63,7 @@ export function LocationAmenities() {
             <div className="mb-6">
               <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Prime Location</h2>
               <p className="text-gray-500 text-sm mt-1">
-                Kachaudi Gali, Lahori Tola, Varanasi — Old City centre
+                CK 25/14, Kachori Gali, Chowk (Near Chowk Thana), Varanasi — Old City centre
               </p>
             </div>
 
@@ -85,7 +85,7 @@ export function LocationAmenities() {
             </div>
 
             <a
-              href="https://maps.app.goo.gl/nGkDab58p3uh257E9"
+              href="https://www.google.com/maps?cid=9450043541275721731"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 mt-5 text-sm font-semibold text-amber-700 hover:text-amber-800 underline underline-offset-2"
@@ -102,7 +102,7 @@ export function LocationAmenities() {
           <div className="rounded-2xl overflow-hidden shadow-md border border-gray-100 h-[300px] md:h-[360px]">
             <iframe
               title="Shiv Ashray Location"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3605.876744946246!2d82.97265!3d25.31047!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x398e2e5d4b3f1f2f%3A0x1234567890abcdef!2sShiv%20Ashray!5e0!3m2!1sen!2sin!4v1234567890"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3606.735866071418!2d83.00883451128216!3d25.313076926903534!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x398e2f0033162a4d%3A0x83254c8845b6c003!2sShiv%20Ashray!5e0!3m2!1sen!2sin!4v1791631744514!5m2!1sen!2sin"
               width="100%"
               height="100%"
               style={{ border: 0 }}

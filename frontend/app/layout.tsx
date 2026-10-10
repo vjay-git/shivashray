@@ -99,7 +99,7 @@ export default function RootLayout({
                 'Premier lodging in the heart of Varanasi\'s old city, 220 m from Kashi Vishwanath Temple and 2–5 min walk to Ganga Ghats.',
               address: {
                 '@type': 'PostalAddress',
-                streetAddress: '25/14, Kachaudi Gali, Lahori Tola',
+                streetAddress: 'CK 25/14, Kachori Gali, Chowk, Near Chowk Thana',
                 addressLocality: 'Varanasi',
                 addressRegion: 'Uttar Pradesh',
                 postalCode: '221001',
@@ -111,7 +111,7 @@ export default function RootLayout({
               priceRange: '₹₹',
               checkinTime: '12:00',
               checkoutTime: '11:00',
-              hasMap: 'https://maps.app.goo.gl/nGkDab58p3uh257E9',
+              hasMap: 'https://www.google.com/maps?cid=9450043541275721731',
               amenityFeature: [
                 { '@type': 'LocationFeatureSpecification', name: 'Free WiFi', value: true },
                 { '@type': 'LocationFeatureSpecification', name: 'Air Conditioning', value: true },

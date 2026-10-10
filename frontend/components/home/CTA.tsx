@@ -73,7 +73,7 @@ export function CTA() {
       {/* Bottom strip */}
       <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-white/40 text-[12px]">
         <p>© {new Date().getFullYear()} Shiv Ashray, Varanasi. All rights reserved.</p>
-        <p>Kachaudi Gali, Lahori Tola, Varanasi – 221001</p>
+        <p>CK 25/14, Kachori Gali, Chowk (Near Chowk Thana), Varanasi – 221001</p>
       </div>
     </section>
   );
