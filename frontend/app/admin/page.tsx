@@ -31,17 +31,13 @@ export default function AdminDashboard() {
 
   const fetchBookings = async () => {
     try {
-      const response = await api.get('/admin/bookings');
-      setBookings(response.data);
-      
-      // Calculate stats
-      const total = response.data.length;
-      const confirmed = response.data.filter((b: Booking) => b.status === 'confirmed').length;
-      const pending = response.data.filter((b: Booking) => b.status === 'pending').length;
-      const revenue = response.data
-        .filter((b: Booking) => b.payment_status === 'paid')
-        .reduce((sum: number, b: Booking) => sum + b.total_amount, 0);
-      
+      const [bookingsRes, analyticsRes] = await Promise.all([
+        api.get('/admin/bookings'),
+        api.get('/admin/analytics'),
+      ]);
+      setBookings(bookingsRes.data);
+      // PAY-03/09: stats come from server-side aggregation, not client float reduction
+      const { total, confirmed, pending, revenue } = analyticsRes.data;
       setStats({ total, confirmed, pending, revenue });
     } catch (error) {
       console.error('Error fetching bookings:', error);
@@ -170,7 +166,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <p className="text-[13px] text-gray-600 font-medium mb-1">Revenue</p>
-              <p className="text-[32px] font-semibold text-gray-900 tracking-tight">₹{stats.revenue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
+              <p className="text-[32px] font-semibold text-gray-900 tracking-tight">₹{stats.revenue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
             </div>
           </div>
 

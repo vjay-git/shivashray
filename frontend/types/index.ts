@@ -40,6 +40,7 @@ export interface Room {
 
 export interface Booking {
   id: number;
+  booking_ref: string;
   user_id?: number;
   room_id: number;
   check_in_date: string;
@@ -48,7 +49,10 @@ export interface Booking {
   number_of_adults?: number;
   number_of_children?: number;
   total_amount: number;
-  status: 'pending' | 'confirmed' | 'checked_in' | 'checked_out' | 'cancelled';
+  tax_amount: number;
+  tax_rate: number;
+  currency: string;
+  status: 'pending' | 'confirmed' | 'checked_in' | 'checked_out' | 'cancelled' | 'no_show';
   payment_status: 'pending' | 'paid' | 'refunded';
   guest_name: string;
   guest_email: string;

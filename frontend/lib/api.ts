@@ -2,9 +2,13 @@ import axios from 'axios';
 import { Room, RoomType, Service, Booking, User } from '@/types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
-// Use mock API if explicitly set to true, or if no API URL is provided (for static deployment)
-const USE_MOCK_API = process.env.NEXT_PUBLIC_USE_MOCK_API === 'true' || 
-                     (process.env.NEXT_PUBLIC_USE_MOCK_API !== 'false' && !process.env.NEXT_PUBLIC_API_URL);
+// BF-01: Mock mode must be explicitly opted in — never defaults to true in production.
+// Set NEXT_PUBLIC_USE_MOCK_API=true only in local / Storybook / test environments.
+const USE_MOCK_API = process.env.NEXT_PUBLIC_USE_MOCK_API === 'true';
+
+if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production' && USE_MOCK_API) {
+  console.error('[api] NEXT_PUBLIC_USE_MOCK_API=true in production — bookings will NOT be persisted!');
+}
 
 // Log mock mode status in development
 if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development' && USE_MOCK_API) {
@@ -226,14 +230,21 @@ const handleMockRequest = (method: string, url: string, data?: any, params?: any
       }
       // Bookings endpoints
       else if (method === 'POST' && url.includes('/bookings')) {
+        const pretax = data.total_amount || 5000;
+        const mockTaxRate = pretax >= 7500 ? 0.18 : pretax >= 2500 ? 0.12 : 0;
+        const mockTaxAmount = Math.round(pretax * mockTaxRate * 100) / 100;
         const newBooking: Booking = {
           id: mockBookings.length + 1,
+          booking_ref: `SHIV-${Math.random().toString(16).slice(2, 10).toUpperCase()}`,
           user_id: 1,
           room_id: data.room_id || 1,
           check_in_date: data.check_in_date,
           check_out_date: data.check_out_date,
           number_of_guests: data.number_of_guests || 2,
-          total_amount: data.total_amount || 5000,
+          total_amount: pretax + mockTaxAmount,
+          tax_amount: mockTaxAmount,
+          tax_rate: mockTaxRate,
+          currency: 'INR',
           status: 'pending',
           payment_status: 'pending',
           guest_name: data.guest_name || 'Guest',
@@ -267,7 +278,16 @@ const handleMockRequest = (method: string, url: string, data?: any, params?: any
         response = booking;
       }
       // Admin endpoints
-      else if (url.includes('/admin/bookings')) {
+      else if (url.includes('/admin/analytics')) {
+        const paid = mockBookings.filter((b) => b.payment_status === 'paid');
+        response = {
+          total: mockBookings.length,
+          confirmed: mockBookings.filter((b) => b.status === 'confirmed').length,
+          pending: mockBookings.filter((b) => b.status === 'pending').length,
+          checked_in: mockBookings.filter((b) => b.status === 'checked_in').length,
+          revenue: paid.reduce((sum, b) => sum + b.total_amount, 0),
+        };
+      } else if (url.includes('/admin/bookings')) {
         response = mockBookings;
       }
       // Default
@@ -341,6 +361,8 @@ api.interceptors.response.use(
           localStorage.removeItem('access_token');
           localStorage.removeItem('refresh_token');
           if (typeof window !== 'undefined') {
+            // BF-08: persist the current URL so the user returns here after login
+            sessionStorage.setItem('post_login_redirect', window.location.pathname + window.location.search);
             window.location.href = '/login';
           }
           return Promise.reject(refreshError);

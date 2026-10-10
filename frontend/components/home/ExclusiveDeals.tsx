@@ -1,6 +1,6 @@
 'use client';
 
-import { getBookingEngineUrl } from '@/lib/booking-engine';
+import Link from 'next/link';
 
 const TRUST_ITEMS = [
   {
@@ -54,8 +54,6 @@ const TRUST_ITEMS = [
 ];
 
 export function ExclusiveDeals() {
-  const bookingUrl = getBookingEngineUrl();
-
   return (
     <section className="bg-white py-14 md:py-20 px-4 md:px-8 lg:px-12">
       <div className="max-w-7xl mx-auto">
@@ -99,10 +97,8 @@ export function ExclusiveDeals() {
           <p className="text-white/60 text-sm md:text-base mb-7 max-w-md mx-auto">
             Kashi Vishwanath, Ganga Ghat & Kal Bhairav — all within a 2–5 minute walk. No vehicle needed.
           </p>
-          <a
-            href={bookingUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/rooms"
             className="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-[14px] font-bold text-gray-900 transition-all duration-200 hover:brightness-110 active:scale-[0.97]"
             style={{ background: 'linear-gradient(135deg, #C6A75E, #D4AF37)' }}
           >
@@ -110,7 +106,7 @@ export function ExclusiveDeals() {
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
             </svg>
-          </a>
+          </Link>
         </div>
 
       </div>

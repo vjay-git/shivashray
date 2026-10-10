@@ -7,7 +7,7 @@ import api from '@/lib/api';
 import { RoomType } from '@/types';
 import { getRoomTypeImages } from '@/lib/utils/room-images';
 import { hardcodedRoomTypes } from '@/lib/data/room-types';
-import { getBookingEngineUrl } from '@/lib/booking-engine';
+
 
 const ROOM_TAGS: Record<string, string[]> = {
   'Deluxe Room':       ['Free WiFi', 'AC', 'Hot Water', 'TV', '2 Guests'],
@@ -117,7 +117,6 @@ function RoomCardSlideshow({ roomTypeName, roomId }: { roomTypeName: string; roo
 export function RoomsPreview() {
   const [roomTypes, setRoomTypes] = useState<RoomType[]>(hardcodedRoomTypes);
   const [loading, setLoading] = useState(true);
-  const bookingUrl = getBookingEngineUrl();
 
   useEffect(() => {
     api.get('/rooms/types')
@@ -221,15 +220,13 @@ export function RoomsPreview() {
                       >
                         View Details
                       </Link>
-                      <a
-                        href={bookingUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                      <Link
+                        href={`/rooms/${roomType.id}`}
                         className="flex-1 text-center py-2.5 rounded-xl text-[13px] font-bold text-gray-900 transition-all duration-200 hover:brightness-110 active:scale-[0.97]"
                         style={{ background: 'linear-gradient(135deg, #C6A75E, #D4AF37)' }}
                       >
                         Book Now
-                      </a>
+                      </Link>
                     </div>
                   </div>
                 </div>

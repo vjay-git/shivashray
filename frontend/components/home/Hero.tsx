@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { getBookingEngineUrl } from '@/lib/booking-engine';
+import Link from 'next/link';
 
 const TRUST = [
   {
@@ -44,8 +44,6 @@ const TRUST = [
 ];
 
 export function Hero() {
-  const bookingUrl = getBookingEngineUrl();
-
   return (
     // Fix 1: h-[100dvh] avoids iOS Safari 100vh jump; min-h-screen is the fallback
     <section className="relative h-[100dvh] min-h-screen flex flex-col -mt-[72px] overflow-hidden">
@@ -125,10 +123,8 @@ export function Hero() {
                    equal width when stacked on mobile, not a mismatched pair.
         */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full max-w-xs sm:max-w-none sm:w-auto">
-          <a
-            href={bookingUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/rooms"
             className="group inline-flex items-center justify-center gap-2.5 px-10 py-4 rounded-full text-[14.5px] font-semibold text-gray-900 shadow-[0_8px_40px_rgba(198,167,94,0.45)] transition-all duration-300 hover:shadow-[0_12px_48px_rgba(198,167,94,0.6)] hover:scale-[1.02] active:scale-[0.98]"
             style={{ background: 'linear-gradient(135deg, #C6A75E 0%, #D4AF37 50%, #C6A75E 100%)' }}
           >
@@ -136,7 +132,7 @@ export function Hero() {
             <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
             </svg>
-          </a>
+          </Link>
           <a
             href="/rooms"
             className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full text-[14px] font-medium text-white/85 border border-white/20 hover:border-white/45 hover:text-white hover:bg-white/10 transition-all duration-300"

@@ -5,6 +5,15 @@ import api from '@/lib/api';
 import { Service } from '@/types';
 import Link from 'next/link';
 
+const FALLBACK_SERVICES: Service[] = [
+  { id: 1, name: 'Free WiFi', description: 'High-speed internet access throughout the hotel', icon: '📶', is_active: true, created_at: '' },
+  { id: 2, name: '24/7 Reception', description: 'Round-the-clock front desk assistance', icon: '🛎️', is_active: true, created_at: '' },
+  { id: 3, name: '24-Hr Hot Water', description: 'Uninterrupted hot water supply in every room', icon: '🚿', is_active: true, created_at: '' },
+  { id: 4, name: 'Power Backup', description: 'Generator backup ensures no interruption to your stay', icon: '⚡', is_active: true, created_at: '' },
+  { id: 5, name: 'Doctor on Call', description: 'Medical assistance available on request', icon: '🩺', is_active: true, created_at: '' },
+  { id: 6, name: 'Pilgrimage Assistance', description: 'Temple visit guidance and local arrangements', icon: '🪔', is_active: true, created_at: '' },
+];
+
 export function Services() {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,19 +53,16 @@ export function Services() {
   const fetchServices = async () => {
     try {
       const response = await api.get('/services');
-      setServices(response.data.slice(0, 6)); // Show first 6 services
-    } catch (error) {
-      console.error('Error fetching services:', error);
+      const data: Service[] = response.data.slice(0, 6);
+      setServices(data.length ? data : FALLBACK_SERVICES);
+    } catch {
+      setServices(FALLBACK_SERVICES);
     } finally {
       setLoading(false);
     }
   };
 
   if (loading) {
-    return null;
-  }
-
-  if (services.length === 0) {
     return null;
   }
 

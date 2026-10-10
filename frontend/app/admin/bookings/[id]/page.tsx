@@ -1,11 +1,27 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { Booking } from '@/types';
 import { useAuthStore } from '@/lib/store';
 import { format } from 'date-fns';
+
+// BF-10: mirrors the backend state machine — only show buttons the backend will accept
+const VALID_BOOKING_TRANSITIONS: Record<string, string[]> = {
+  pending:    ['confirmed', 'cancelled'],
+  confirmed:  ['checked_in', 'cancelled', 'no_show'],
+  checked_in: ['checked_out'],
+  checked_out: [],
+  cancelled:  [],
+  no_show:    [],
+};
+
+const VALID_PAYMENT_TRANSITIONS: Record<string, string[]> = {
+  pending:  ['paid'],
+  paid:     ['refunded'],
+  refunded: [],
+};
 
 export default function AdminBookingDetailPage() {
   const params = useParams();
@@ -15,6 +31,10 @@ export default function AdminBookingDetailPage() {
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [updating, setUpdating] = useState(false);
+  const [actionError, setActionError] = useState('');
+  const [markPaidDialog, setMarkPaidDialog] = useState(false);
+  const [paymentRef, setPaymentRef] = useState('');
+  const updatingRef = useRef(false); // PAY-12: synchronous guard against double-click
 
   useEffect(() => {
     setMounted(true);
@@ -36,35 +56,56 @@ export default function AdminBookingDetailPage() {
     }
   };
 
-  const updateBookingStatus = async (status: string, paymentStatus?: string) => {
+  const doUpdate = async (payload: Record<string, string>) => {
+    if (updatingRef.current) return; // PAY-12
+    updatingRef.current = true;
     setUpdating(true);
+    setActionError('');
     try {
-      const updateData: any = { status };
-      if (paymentStatus) {
-        updateData.payment_status = paymentStatus;
-      }
-      await api.patch(`/admin/bookings/${params.id}`, updateData);
+      await api.patch(`/admin/bookings/${params.id}`, payload);
       await fetchBooking();
-    } catch (error) {
-      console.error('Error updating booking:', error);
-      alert('Failed to update booking');
+    } catch (err: any) {
+      const detail = err.response?.data?.detail;
+      if (detail?.code === 'PAYMENT_PENDING') {
+        setActionError('Payment not confirmed — mark as paid before checking in.');
+      } else if (typeof detail === 'string') {
+        setActionError(detail);
+      } else {
+        setActionError('Failed to update booking. Please try again.');
+      }
     } finally {
       setUpdating(false);
+      updatingRef.current = false;
+    }
+  };
+
+  const updateBookingStatus = (targetStatus: string) => doUpdate({ status: targetStatus });
+
+  const confirmMarkAsPaid = async () => {
+    setMarkPaidDialog(false);
+    await doUpdate({
+      payment_status: 'paid',
+      ...(paymentRef.trim() ? { payment_reference: paymentRef.trim() } : {}),
+    });
+    setPaymentRef('');
+  };
+
+  const updatePaymentStatus = (targetPayment: string) => {
+    if (targetPayment === 'paid') {
+      setMarkPaidDialog(true); // PAY-16: require confirmation + reference
+    } else {
+      doUpdate({ payment_status: targetPayment });
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'confirmed':
-        return 'bg-emerald-50/80 text-emerald-700 border-emerald-200/60';
-      case 'checked_in':
-        return 'bg-blue-50/80 text-blue-700 border-blue-200/60';
-      case 'checked_out':
-        return 'bg-slate-50/80 text-slate-700 border-slate-200/60';
-      case 'cancelled':
-        return 'bg-rose-50/80 text-rose-700 border-rose-200/60';
-      default:
-        return 'bg-amber-50/80 text-amber-700 border-amber-200/60';
+      case 'confirmed':   return 'bg-emerald-50/80 text-emerald-700 border-emerald-200/60';
+      case 'checked_in':  return 'bg-blue-50/80 text-blue-700 border-blue-200/60';
+      case 'checked_out': return 'bg-slate-50/80 text-slate-700 border-slate-200/60';
+      case 'cancelled':   return 'bg-rose-50/80 text-rose-700 border-rose-200/60';
+      case 'no_show':     return 'bg-gray-50/80 text-gray-600 border-gray-200/60';
+      default:            return 'bg-amber-50/80 text-amber-700 border-amber-200/60';
     }
   };
 
@@ -133,7 +174,7 @@ export default function AdminBookingDetailPage() {
                   </svg>
                 </button>
                 <div>
-                  <h1 className="text-[28px] font-semibold text-gray-900 tracking-tight">Booking #{booking.id}</h1>
+                  <h1 className="text-[28px] font-semibold text-gray-900 tracking-tight font-mono">{booking.booking_ref}</h1>
                   <p className="text-[13px] text-gray-600 font-light mt-0.5">Manage booking details and status</p>
                 </div>
               </div>
@@ -142,7 +183,20 @@ export default function AdminBookingDetailPage() {
         </div>
 
         <div className="max-w-5xl mx-auto px-6 lg:px-8 py-8">
-          <div 
+          {actionError && (
+            <div className="mb-6 bg-rose-50/80 border border-rose-100 rounded-2xl px-5 py-4 flex items-center space-x-3">
+              <svg className="w-5 h-5 text-rose-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="text-[15px] text-rose-800 font-medium">{actionError}</span>
+              <button onClick={() => setActionError('')} className="ml-auto text-rose-400 hover:text-rose-600">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          )}
+          <div
             className={`transition-all duration-700 ease-out ${
               mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
             }`}
@@ -263,54 +317,59 @@ export default function AdminBookingDetailPage() {
             <div className="bg-white/70 backdrop-blur-2xl rounded-[28px] shadow-[0_8px_32px_rgba(0,0,0,0.08)] border border-white/20 overflow-hidden">
               <div className="px-8 py-6 border-b border-gray-100/60">
                 <h2 className="text-[24px] font-semibold text-gray-900 tracking-tight">Manage Status</h2>
-                <p className="text-[15px] text-gray-600 font-light mt-1">Update booking and payment status</p>
+                <p className="text-[15px] text-gray-600 font-light mt-1">Only valid transitions are enabled</p>
               </div>
 
               <div className="p-8">
                 <div className="space-y-4">
+                  {/* BF-10: buttons are enabled only when the transition is valid for the current status */}
                   <div>
                     <p className="text-[13px] text-gray-500 uppercase tracking-wide font-medium mb-4">Booking Status</p>
                     <div className="flex flex-wrap gap-3">
-                      <button
-                        onClick={() => updateBookingStatus('confirmed')}
-                        disabled={updating || booking.status === 'confirmed'}
-                        className="px-5 py-2.5 bg-emerald-50/80 text-emerald-700 rounded-xl text-[15px] font-medium hover:bg-emerald-100/80 active:scale-[0.98] transition-all duration-300 ease-out disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 border border-emerald-200/60"
-                      >
-                        Confirm
-                      </button>
-                      <button
-                        onClick={() => updateBookingStatus('checked_in')}
-                        disabled={updating || booking.status === 'checked_in'}
-                        className="px-5 py-2.5 bg-blue-50/80 text-blue-700 rounded-xl text-[15px] font-medium hover:bg-blue-100/80 active:scale-[0.98] transition-all duration-300 ease-out disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 border border-blue-200/60"
-                      >
-                        Check In
-                      </button>
-                      <button
-                        onClick={() => updateBookingStatus('checked_out')}
-                        disabled={updating || booking.status === 'checked_out'}
-                        className="px-5 py-2.5 bg-slate-50/80 text-slate-700 rounded-xl text-[15px] font-medium hover:bg-slate-100/80 active:scale-[0.98] transition-all duration-300 ease-out disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 border border-slate-200/60"
-                      >
-                        Check Out
-                      </button>
-                      <button
-                        onClick={() => updateBookingStatus('cancelled')}
-                        disabled={updating || booking.status === 'cancelled'}
-                        className="px-5 py-2.5 bg-rose-50/80 text-rose-700 rounded-xl text-[15px] font-medium hover:bg-rose-100/80 active:scale-[0.98] transition-all duration-300 ease-out disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 border border-rose-200/60"
-                      >
-                        Cancel
-                      </button>
+                      {[
+                        { target: 'confirmed',   label: 'Confirm',    cls: 'bg-emerald-50/80 text-emerald-700 hover:bg-emerald-100/80 border-emerald-200/60' },
+                        { target: 'checked_in',  label: 'Check In',   cls: 'bg-blue-50/80 text-blue-700 hover:bg-blue-100/80 border-blue-200/60' },
+                        { target: 'checked_out', label: 'Check Out',  cls: 'bg-slate-50/80 text-slate-700 hover:bg-slate-100/80 border-slate-200/60' },
+                        { target: 'no_show',     label: 'No Show',    cls: 'bg-gray-50/80 text-gray-600 hover:bg-gray-100/80 border-gray-200/60' },
+                        { target: 'cancelled',   label: 'Cancel',     cls: 'bg-rose-50/80 text-rose-700 hover:bg-rose-100/80 border-rose-200/60' },
+                      ].map(({ target, label, cls }) => {
+                        const allowed = VALID_BOOKING_TRANSITIONS[booking.status] ?? [];
+                        const isAllowed = allowed.includes(target);
+                        return (
+                          <button
+                            key={target}
+                            onClick={() => updateBookingStatus(target)}
+                            disabled={updating || !isAllowed}
+                            className={`px-5 py-2.5 rounded-xl text-[15px] font-medium active:scale-[0.98] transition-all duration-300 ease-out disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100 border ${cls}`}
+                          >
+                            {label}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 
                   <div className="pt-4 border-t border-gray-100/60">
                     <p className="text-[13px] text-gray-500 uppercase tracking-wide font-medium mb-4">Payment Status</p>
-                    <button
-                      onClick={() => updateBookingStatus(booking.status, 'paid')}
-                      disabled={updating || booking.payment_status === 'paid'}
-                      className="px-5 py-2.5 bg-emerald-50/80 text-emerald-700 rounded-xl text-[15px] font-medium hover:bg-emerald-100/80 active:scale-[0.98] transition-all duration-300 ease-out disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 border border-emerald-200/60"
-                    >
-                      Mark as Paid
-                    </button>
+                    <div className="flex flex-wrap gap-3">
+                      {[
+                        { target: 'paid',     label: 'Mark as Paid',     cls: 'bg-emerald-50/80 text-emerald-700 hover:bg-emerald-100/80 border-emerald-200/60' },
+                        { target: 'refunded', label: 'Mark as Refunded', cls: 'bg-slate-50/80 text-slate-700 hover:bg-slate-100/80 border-slate-200/60' },
+                      ].map(({ target, label, cls }) => {
+                        const allowed = VALID_PAYMENT_TRANSITIONS[booking.payment_status] ?? [];
+                        const isAllowed = allowed.includes(target);
+                        return (
+                          <button
+                            key={target}
+                            onClick={() => updatePaymentStatus(target)}
+                            disabled={updating || !isAllowed}
+                            className={`px-5 py-2.5 rounded-xl text-[15px] font-medium active:scale-[0.98] transition-all duration-300 ease-out disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100 border ${cls}`}
+                          >
+                            {label}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -318,6 +377,54 @@ export default function AdminBookingDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* PAY-16: Mark as Paid confirmation modal */}
+      {markPaidDialog && booking && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-6">
+          <div className="bg-white rounded-[28px] shadow-2xl max-w-sm w-full p-8 space-y-6">
+            <div className="text-center">
+              <div className="w-14 h-14 mx-auto rounded-full bg-emerald-50 flex items-center justify-center mb-4">
+                <svg className="w-7 h-7 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-[20px] font-semibold text-gray-900 mb-1">Confirm Payment</h3>
+              <p className="text-[15px] text-gray-600 font-light">
+                {booking.guest_name} · {booking.booking_ref}
+              </p>
+              <p className="text-[24px] font-semibold text-gray-900 mt-2">
+                ₹{booking.total_amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </p>
+            </div>
+            <div>
+              <label className="block text-[13px] text-gray-500 uppercase tracking-wide font-medium mb-2">
+                Reference <span className="normal-case text-gray-400 font-normal">(UPI/cash receipt — optional)</span>
+              </label>
+              <input
+                type="text"
+                value={paymentRef}
+                onChange={e => setPaymentRef(e.target.value)}
+                placeholder="e.g. UPI/123456789012"
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-[15px] text-gray-900 focus:outline-none focus:border-[#007aff]/40 transition-colors"
+              />
+            </div>
+            <div className="space-y-3">
+              <button
+                onClick={confirmMarkAsPaid}
+                className="w-full px-6 py-3.5 bg-emerald-600 text-white text-[15px] font-semibold rounded-2xl hover:bg-emerald-700 transition-colors"
+              >
+                Mark as Paid
+              </button>
+              <button
+                onClick={() => { setMarkPaidDialog(false); setPaymentRef(''); }}
+                className="w-full px-6 py-3.5 bg-gray-100 text-gray-700 text-[15px] font-medium rounded-2xl hover:bg-gray-200 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

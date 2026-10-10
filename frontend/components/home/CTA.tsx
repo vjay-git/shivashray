@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { getBookingEngineUrl } from '@/lib/booking-engine';
 
 const QUICK_LINKS = [
   { label: 'Rooms & Rates', href: '/rooms' },
@@ -11,8 +10,6 @@ const QUICK_LINKS = [
 ];
 
 export function CTA() {
-  const bookingUrl = getBookingEngineUrl();
-
   return (
     <section
       className="py-14 md:py-20 px-4 md:px-8 lg:px-12"
@@ -48,10 +45,8 @@ export function CTA() {
 
         {/* Right: CTA buttons */}
         <div className="flex flex-col sm:flex-row gap-3 shrink-0">
-          <a
-            href={bookingUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/rooms"
             className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl text-[14px] font-bold text-gray-900 transition-all duration-200 hover:brightness-110 active:scale-[0.97] whitespace-nowrap"
             style={{ background: 'linear-gradient(135deg, #C6A75E, #D4AF37)' }}
           >
@@ -59,7 +54,7 @@ export function CTA() {
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
             </svg>
-          </a>
+          </Link>
           <Link
             href="/contact"
             className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl text-[14px] font-semibold text-white border border-white/20 hover:border-white/40 hover:bg-white/5 transition-all duration-200 whitespace-nowrap"

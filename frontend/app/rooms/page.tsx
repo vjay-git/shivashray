@@ -2,14 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import api from '@/lib/api';
-import { RoomType } from '@/types';
+import { RoomType, Room } from '@/types';
 import Link from 'next/link';
 import Image from 'next/image';
 import { hotelContent } from '@/lib/content/hotel-content';
 import { getRoomTypeImage } from '@/lib/utils/room-images';
 import { hardcodedRoomTypes } from '@/lib/data/room-types';
 import { PremiumBackground } from '@/components/layout/PremiumBackground';
-import { getBookingEngineUrl } from '@/lib/booking-engine';
 
 const GOLD = '#D4AF37';
 const SERIF = 'var(--font-playfair-display), Georgia, serif';
@@ -23,14 +22,22 @@ const COVER_IMG: Record<string, number> = {
 
 export default function RoomsPage() {
   const [roomTypes, setRoomTypes]   = useState<RoomType[]>([]);
+  const [rooms, setRooms]           = useState<Room[]>([]);
   const [mounted, setMounted]       = useState(false);
   const [activeIdx, setActiveIdx]   = useState(0);
   const [imgVisible, setImgVisible] = useState(true);
-  const bookingEngineUrl = getBookingEngineUrl();
+
+  // Fallback room IDs when API is unavailable (matches seeded data)
+  const FALLBACK_ROOM: Record<number, number> = { 1: 1, 2: 3, 3: 5 };
+  const firstRoomUrl = (typeId: number): string => {
+    const room = rooms.find(r => r.room_type_id === typeId && r.is_active);
+    return `/rooms/${room?.id ?? FALLBACK_ROOM[typeId] ?? 1}`;
+  };
 
   useEffect(() => {
     setMounted(true);
     fetchRoomTypes();
+    fetchRooms();
   }, []);
 
   const fetchRoomTypes = async () => {
@@ -39,6 +46,15 @@ export default function RoomsPage() {
       setRoomTypes(res.data?.length ? res.data : hardcodedRoomTypes);
     } catch {
       setRoomTypes(hardcodedRoomTypes);
+    }
+  };
+
+  const fetchRooms = async () => {
+    try {
+      const res = await api.get('/rooms');
+      setRooms(res.data ?? []);
+    } catch {
+      // fallback IDs used via FALLBACK_ROOM
     }
   };
 
@@ -110,17 +126,13 @@ export default function RoomsPage() {
 
                 {/* CTAs */}
                 <div className="flex flex-wrap gap-3">
-                  <a
-                    href={bookingEngineUrl}
-                    target="_blank" rel="noopener noreferrer"
+                  <Link
+                    href="#showcase"
                     className="inline-flex items-center gap-2 px-6 md:px-7 py-3 md:py-3.5 rounded-2xl font-semibold text-[14px] md:text-[15px] transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
                     style={{ background: GOLD, color: '#0F1115' }}
                   >
                     Book Now
-                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                      <path d="M2 10L10 2M10 2H5M10 2V7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </a>
+                  </Link>
                   <Link
                     href="#showcase"
                     className="inline-flex items-center px-6 md:px-7 py-3 md:py-3.5 rounded-2xl font-medium text-[14px] md:text-[15px] text-white border border-white/25 hover:bg-white/10 transition-all duration-200"
@@ -231,6 +243,7 @@ export default function RoomsPage() {
                             background: i === activeIdx ? GOLD : 'rgba(255,255,255,0.5)',
                           }}
                           aria-label={`Room type ${i + 1}`}
+                          aria-pressed={i === activeIdx}
                         />
                       ))}
                     </div>
@@ -269,6 +282,7 @@ export default function RoomsPage() {
                           </span>
                           <span className="text-[14px] text-slate-400 dark:text-slate-500 font-light">/night</span>
                         </div>
+                        <p className="text-[12px] text-slate-400 dark:text-slate-500 font-light mt-1">+ GST (12–18% depending on rate)</p>
                       </div>
 
                       <div className="h-px bg-slate-200/70 dark:bg-slate-700/50 mb-6" />
@@ -298,17 +312,13 @@ export default function RoomsPage() {
 
                       {/* CTAs */}
                       <div className="flex flex-col sm:flex-row gap-3">
-                        <a
-                          href={bookingEngineUrl}
-                          target="_blank" rel="noopener noreferrer"
+                        <Link
+                          href={firstRoomUrl(activeType.id)}
                           className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl font-semibold text-[15px] transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
                           style={{ background: GOLD, color: '#0F1115' }}
                         >
-                          Book Now
-                          <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-                            <path d="M2 11L11 2M11 2H5M11 2V8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
-                        </a>
+                          Book This Room
+                        </Link>
                       </div>
                     </div>
                   )}
@@ -434,17 +444,13 @@ export default function RoomsPage() {
                 <p className="text-[15px] text-white/65 font-light mb-8 max-w-xs mx-auto leading-relaxed">
                   Secure your stay instantly via our trusted booking partner.
                 </p>
-                <a
-                  href={bookingEngineUrl}
-                  target="_blank" rel="noopener noreferrer"
+                <Link
+                  href="#showcase"
                   className="inline-flex items-center gap-2.5 px-10 py-4 rounded-2xl font-semibold text-[16px] transition-all duration-200 hover:scale-[1.03] active:scale-[0.98] shadow-xl"
                   style={{ background: GOLD, color: '#0F1115' }}
                 >
-                  Book on Stayflexi
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                    <path d="M2.5 11.5L11.5 2.5M11.5 2.5H5.5M11.5 2.5V8.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </a>
+                  Browse &amp; Book
+                </Link>
               </div>
             </div>
           </div>

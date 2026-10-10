@@ -4,7 +4,6 @@ import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { hotelContent } from '@/lib/content/hotel-content';
-import { getBookingEngineUrl } from '@/lib/booking-engine';
 
 const GOLD = '#D4AF37';
 const GOLD_LIGHT = '#C6A75E';
@@ -126,8 +125,6 @@ function GoldDivider() {
 export default function AboutPage() {
   const [mounted, setMounted] = useState(false);
   const { visible, refs } = useScrollReveal();
-  const bookingUrl = getBookingEngineUrl();
-
   useEffect(() => { setMounted(true); }, []);
 
   return (
@@ -397,10 +394,8 @@ export default function AboutPage() {
           </p>
           <GoldDivider />
           <div className="mt-10">
-            <a
-              href={bookingUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/rooms"
               className="inline-flex items-center gap-2.5 px-10 py-4 rounded-full text-[14.5px] font-semibold text-gray-900 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-[0_8px_32px_rgba(198,167,94,0.4)]"
               style={{ background: `linear-gradient(135deg, ${GOLD_LIGHT} 0%, ${GOLD} 50%, ${GOLD_LIGHT} 100%)` }}
             >
@@ -408,7 +403,7 @@ export default function AboutPage() {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
               </svg>
-            </a>
+            </Link>
           </div>
         </div>
       </section>

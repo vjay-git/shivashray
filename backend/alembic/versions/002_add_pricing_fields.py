@@ -1,7 +1,7 @@
 """Add pricing fields for room types and booking
 
 Revision ID: 002
-Revises: 001
+Revises: 001_initial
 Create Date: 2025-01-XX
 
 """
@@ -11,7 +11,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = '002'
-down_revision = '001'
+down_revision = '001_initial'
 branch_labels = None
 depends_on = None
 

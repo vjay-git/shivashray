@@ -1,31 +1,28 @@
 'use client';
 
-import { useEffect } from 'react';
-import { getBookingEngineUrl } from '@/lib/booking-engine';
+import Link from 'next/link';
 
 export default function BookingsPage() {
-  const bookingEngineUrl = getBookingEngineUrl();
-
-  useEffect(() => {
-    // Lightweight handoff: avoid maintaining redundant booking UI inside the site.
-    window.location.href = bookingEngineUrl;
-  }, [bookingEngineUrl]);
-
   return (
-    <div className="min-h-[60vh] flex items-center justify-center px-6">
-      <div className="text-center max-w-lg">
-        <p className="text-[18px] text-slate-700 dark:text-slate-300 font-light mb-4">
-          Redirecting you to our booking engine…
-        </p>
-        <a
-          href={bookingEngineUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center justify-center px-6 py-3 rounded-2xl font-semibold text-[15px] transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
-          style={{ background: '#D4AF37', color: '#0F1115' }}
+    <div className="min-h-[60vh] flex items-center justify-center px-6 bg-[#f5f5f7]">
+      <div className="text-center max-w-lg space-y-6">
+        <div className="w-16 h-16 mx-auto rounded-2xl bg-gray-100 flex items-center justify-center">
+          <svg className="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+        </div>
+        <div>
+          <h1 className="text-[28px] font-semibold text-gray-900 tracking-tight mb-2">Your Bookings</h1>
+          <p className="text-[16px] text-gray-500 font-light">
+            Have a booking reference? Your confirmation was emailed to you after booking.
+          </p>
+        </div>
+        <Link
+          href="/rooms"
+          className="inline-block px-8 py-3.5 bg-gray-900 text-white text-[15px] font-semibold rounded-2xl hover:bg-gray-800 transition-colors"
         >
-          Open Stayflexi
-        </a>
+          Browse Rooms
+        </Link>
       </div>
     </div>
   );

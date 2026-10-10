@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, Boolean, Text, ForeignKey, DateTime, Table
+from sqlalchemy import Column, Integer, String, Boolean, Text, ForeignKey, DateTime, Table, Numeric
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.core.database import Base
@@ -18,9 +18,9 @@ class RoomType(Base):
     name = Column(String, nullable=False, unique=True)  # e.g., "Deluxe Room", "Super Deluxe Room"
     description = Column(Text, nullable=True)
     max_occupancy = Column(Integer, nullable=False, default=2)
-    base_price = Column(Float, nullable=False)  # Base price for double occupancy (Deluxe/Super Deluxe) or quad (Family)
-    extra_adult_price = Column(Float, nullable=True)  # Price per night for extra adult
-    child_price = Column(Float, nullable=True)  # Price per night for child
+    base_price = Column(Numeric(10, 2), nullable=False)
+    extra_adult_price = Column(Numeric(10, 2), nullable=True)
+    child_price = Column(Numeric(10, 2), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
     rooms = relationship("Room", back_populates="room_type")
